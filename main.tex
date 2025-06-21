@@ -1,8 +1,11 @@
 \documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{enumitem}
 
-\title{LLM Anonyimization Techniques Recommender for Datasets LLMANO-2}
-\author{Amin Akziz, Leander Ziehm, Azba Engineer, Santiago }
+\title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
+\author{Amin Akziz, Leander Ziehm, Azba Engineer, Santiago}
 \date{April 2025}
 
 \begin{document}
@@ -10,8 +13,70 @@
 \maketitle
 
 \section{Introduction}
-We aim to build a custom recommendation system that allows users to upload a CSV dataset and evaluate its anonymity while maintaining predictive accuracy. The system will measure anonymity using K-Anonymity and L-Diversity and ensure that a dataset is aligned with a single purpose.
-\section{}
+The need for anonymizing datasets has grown significantly with the proliferation of machine learning and large language models (LLMs). However, most users lack a clear understanding of how to properly anonymize their data without significantly reducing its utility. Our work introduces a recommender system that leverages LLMs to guide users in anonymizing CSV datasets while preserving predictive performance. As motivation, we reference recent data privacy incidents that highlight the risks of improper anonymization.
 
+\section{Background}
+We outline key privacy concepts including:
+\begin{itemize}
+    \item \textbf{Direct identifiers} (e.g., names, emails)
+    \item \textbf{Quasi-identifiers} (e.g., weight, height, age)
+    \item \textbf{Anonymity metrics} such as $k$-Anonymity and $l$-Diversity
+\end{itemize}
+We also introduce user-driven anonymization processes and the limitations of manual or rule-based methods.
+
+\section{Related Work}
+This section reviews:
+\begin{itemize}
+    \item LLM-based anonymization
+    \item Rule-based anonymization tools
+    \item Human-led anonymization efforts
+\end{itemize}
+We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
+
+\section{Theory}
+We define the mathematical foundations of:
+\begin{itemize}
+    \item $k$-Anonymity (e.g., ensuring each record is indistinguishable among $k$ others)
+    \item $l$-Diversity (ensuring diversity in sensitive attributes)
+    \item Generalization strategies (e.g., age grouped from [10--20], [21--30], [31--40])
+\end{itemize}
+
+\section{Methodology}
+Our system allows users to:
+\begin{enumerate}
+    \item Upload CSV datasets
+    \item Select columns as direct or quasi-identifiers (form includes definitions and examples)
+    \item Receive LLM-generated anonymization recommendations (e.g., $k=10$)
+    \item Optionally adjust granularity and generalization steps
+\end{enumerate}
+LLMs are prompted to recommend anonymization strategies based on dataset structure and user inputs. Screenshots and/or GitHub links will be included.
+
+\section{Architecture}
+\begin{itemize}
+    \item Overview diagram of system components
+    \item LLM interface and decision flow
+    \item Form interface for user inputs (direct/quasi identifier tagging)
+    \item Backend anonymization and evaluation pipeline
+\end{itemize}
+
+\section{Evaluation and Experiments}
+We test our system on multiple datasets:
+\begin{itemize}
+    \item Comparison against human-created anonymization
+    \item Benchmarking against other anonymization algorithms
+    \item Metrics: preservation of predictive accuracy, anonymity scores
+\end{itemize}
+Each configuration is tested 10 times to compute average performance. Evaluation is automated and requires no user interaction.
+
+\section{Limitations, Discussion, and Future Work}
+\begin{itemize}
+    \item Current setup lacks real-time chat interaction for refinement
+    \item Scope limited to $k$-Anonymity and $l$-Diversity; future integration of differential privacy
+    \item Broader comparison with more anonymization techniques needed
+    \item Challenges in dataset diversity and granularity recommendation
+\end{itemize}
+
+\section{Conclusion}
+We presented a prototype LLM-powered anonymization recommender that assists users in balancing privacy with data utility. Our system enables informed anonymization decisions and shows promise compared to existing approaches. Future enhancements will include conversational interfaces and broader evaluation.
 
 \end{document}
