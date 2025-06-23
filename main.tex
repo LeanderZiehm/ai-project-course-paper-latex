@@ -15,7 +15,7 @@
 \section{Introduction}
 The need for anonymizing datasets has grown significantly with the proliferation of machine learning and large language models (LLMs). However, most users lack a clear understanding of how to properly anonymize their data without significantly reducing its utility. Our work introduces a recommender system that leverages LLMs to guide users in anonymizing CSV datasets while preserving predictive performance. As motivation, we reference recent data privacy incidents that highlight the risks of improper anonymization.
 
-\section{Background}
+\section{Background/Theory}
 We outline key privacy concepts including:
 \begin{itemize}
     \item \textbf{Direct identifiers} (e.g., names, emails)
@@ -23,17 +23,6 @@ We outline key privacy concepts including:
     \item \textbf{Anonymity metrics} such as $k$-Anonymity and $l$-Diversity
 \end{itemize}
 We also introduce user-driven anonymization processes and the limitations of manual or rule-based methods.
-
-\section{Related Work}
-This section reviews:
-\begin{itemize}
-    \item LLM-based anonymization
-    \item Rule-based anonymization tools
-    \item Human-led anonymization efforts
-\end{itemize}
-We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
-
-\section{Theory}
 
 In this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, namely \$k\$-anonymity, \$l\$-diversity, and generalization strategies.
 
@@ -110,6 +99,19 @@ Achieving \$k\$-anonymity and \$l\$-diversity typically requires generalization 
 \end{itemize}
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
+
+
+
+
+\section{Related Work}
+This section reviews:
+\begin{itemize}
+    \item LLM-based anonymization
+    \item Rule-based anonymization tools
+    \item Human-led anonymization efforts
+\end{itemize}
+We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
+
 
 
 \section{Methodology}
