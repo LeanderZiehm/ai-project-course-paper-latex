@@ -24,7 +24,7 @@ We outline key privacy concepts including:
 \end{itemize}
 We also introduce user-driven anonymization processes and the limitations of manual or rule-based methods.
 
-In this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, namely \$k\$-anonymity, \$l\$-diversity, and generalization strategies.
+In this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, namely $k$-anonymity, $l$-diversity, and generalization strategies.
 
 \subsection{Identifiers and Quasi-Identifiers}
 
@@ -33,75 +33,67 @@ In the context of privacy-preserving data analysis, it is essential to distingui
 \begin{itemize}
 \item \textbf{Direct Identifiers} are attributes that can uniquely identify an individual without external information. Common examples include names, social security numbers, or email addresses.
 
-```
 \item \textbf{Indirect Identifiers}, also called \textit{quasi-identifiers}, are attributes that do not uniquely identify an individual on their own but can do so when combined with other quasi-identifiers. Examples include age, ZIP code, and gender.
-```
-
 \end{itemize}
 
 Effective anonymization techniques aim to remove or transform these identifiers such that the risk of re-identification is minimized.
 
-\subsection{\$k\$-Anonymity}
+\subsection{$k$-Anonymity}
 
-The concept of \$k\$-anonymity, introduced by Sweeney, is one of the foundational principles for privacy protection. A dataset is said to satisfy \textbf{\$k\$-anonymity} if each record is indistinguishable from at least \$k-1\$ other records with respect to the quasi-identifiers.
+The concept of $k$-anonymity, introduced by Sweeney, is one of the foundational principles for privacy protection. A dataset is said to satisfy \textbf{$k$-anonymity} if each record is indistinguishable from at least $k-1$ other records with respect to the quasi-identifiers.
 
-Formally, given a dataset \$D\$ with quasi-identifier attributes \$Q\_1, Q\_2, ..., Q\_m\$, let \$\pi\$ be a projection onto the quasi-identifier space:
+Formally, given a dataset $D$ with quasi-identifier attributes $Q_1, Q_2, ..., Q_m$, let $\pi$ be a projection onto the quasi-identifier space:
 
 $$
 \pi(D) = \{ (q_1, q_2, ..., q_m) \mid (q_1, ..., q_m) \in D \}
 $$
 
-Let \$E\$ be an equivalence class of records in \$D\$ that share the same quasi-identifier values:
+Let $E$ be an equivalence class of records in $D$ that share the same quasi-identifier values:
 
 $$
 E = \{ r \in D \mid \forall i, \; r[Q_i] = v_i \}
 $$
 
-Then \$D\$ satisfies \$k\$-anonymity if:
+Then $D$ satisfies $k$-anonymity if:
 
 $$
 \forall E \subseteq D, \quad |E| \geq k
 $$
 
-This ensures that an adversary cannot link any given record to fewer than \$k\$ individuals. However, \$k\$-anonymity alone does not prevent \textit{attribute disclosure}—when sensitive values within a group are too homogeneous.
+This ensures that an adversary cannot link any given record to fewer than $k$ individuals. However, $k$-anonymity alone does not prevent \textit{attribute disclosure}—when sensitive values within a group are too homogeneous.
 
-\subsection{\$l\$-Diversity}
+\subsection{$l$-Diversity}
 
-To address the limitations of \$k\$-anonymity, the notion of \textbf{\$l\$-diversity} was proposed. It enhances privacy by requiring that each equivalence class (i.e., group of records sharing the same quasi-identifiers) contains at least \$l\$ \`\`well-represented'' values for the sensitive attribute.
+To address the limitations of $k$-anonymity, the notion of \textbf{$l$-diversity} was proposed. It enhances privacy by requiring that each equivalence class (i.e., group of records sharing the same quasi-identifiers) contains at least $l$ "well-represented" values for the sensitive attribute.
 
-Mathematically, let \$S\$ be the sensitive attribute. An equivalence class \$E\$ satisfies \textit{distinct \$l\$-diversity} if:
+Mathematically, let $S$ be the sensitive attribute. An equivalence class $E$ satisfies \textit{distinct $l$-diversity} if:
 
 $$
 |\{ r[S] \mid r \in E \}| \geq l
 $$
 
-This means that in each equivalence class, there are at least \$l\$ distinct values for the sensitive attribute.
+This means that in each equivalence class, there are at least $l$ distinct values for the sensitive attribute.
 
 More robust variants include:
 \begin{itemize}
-\item \textbf{Entropy \$l\$-Diversity}, which requires the entropy of the sensitive attribute distribution in each class to be at least \$\log l\$:
-$     -\sum_{s \in S} p_s \log p_s \geq \log l
-    $
-where \$p\_s\$ is the fraction of records in the class with sensitive value \$s\$.
+\item \textbf{Entropy $l$-Diversity}, which requires the entropy of the sensitive attribute distribution in each class to be at least $\log l$:
+$$
+-\sum_{s \in S} p_s \log p_s \geq \log l
+$$
+where $p_s$ is the fraction of records in the class with sensitive value $s$.
 
-```
 \item \textbf{Recursive (c, $l$)-Diversity}, which prevents skewness by limiting how dominant the most frequent sensitive value can be.
-```
-
 \end{itemize}
 
 \subsection{Generalization Strategies}
 
-Achieving \$k\$-anonymity and \$l\$-diversity typically requires generalization and/or suppression of quasi-identifier attributes. Generalization replaces specific values with broader categories. For example:
+Achieving $k$-anonymity and $l$-diversity typically requires generalization and/or suppression of quasi-identifier attributes. Generalization replaces specific values with broader categories. For example:
 \begin{itemize}
-\item Age: 23 \$\rightarrow\$ \[21--30]
-\item ZIP Code: 12345 \$\rightarrow\$ 123\textbf{\*\*}
+\item Age: 23 $\rightarrow$ [21--30]
+\item ZIP Code: 12345 $\rightarrow$ 123**
 \end{itemize}
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
-
-
-
 
 \section{Related Work}
 This section reviews:
@@ -111,8 +103,6 @@ This section reviews:
     \item Human-led anonymization efforts
 \end{itemize}
 We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
-
-
 
 \section{Methodology}
 Our system allows users to:
