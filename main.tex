@@ -14,6 +14,8 @@
 
 \section{Introduction}
 The need for anonymizing datasets has grown significantly with the proliferation of machine learning and large language models (LLMs). However, most users lack a clear understanding of how to properly anonymize their data without significantly reducing its utility. Our work introduces a recommender system that leverages LLMs to guide users in anonymizing CSV datasets while preserving predictive performance. As motivation, we reference recent data privacy incidents that highlight the risks of improper anonymization.
+Motivate why use anoanization: for example for open data in goverment research, ML training, sharing data internaly.
+
 
 \section{Background/Theory}
 We outline key privacy concepts including:
@@ -21,6 +23,7 @@ We outline key privacy concepts including:
     \item \textbf{Direct identifiers} (e.g., names, emails)
     \item \textbf{Quasi-identifiers} (e.g., weight, height, age)
     \item \textbf{Anonymity metrics} such as $k$-Anonymity and $l$-Diversity, t-closeness
+    \item \textbf{Anonymization Methods}
 \end{itemize}
 We also introduce user-driven anonymization processes and the limitations of manual or rule-based methods.
 
@@ -85,13 +88,17 @@ where $p_s$ is the fraction of records in the class with sensitive value $s$.
 \item \textbf{Recursive (c, $l$)-Diversity}, which prevents skewness by limiting how dominant the most frequent sensitive value can be.
 \end{itemize}
 
-\subsection{Generalization Strategies}
+\subsection{Anonymization Methods}
+
+Generalization
 
 Achieving $k$-anonymity and $l$-diversity typically requires generalization and/or suppression of quasi-identifier attributes. Generalization replaces specific values with broader categories. For example:
 \begin{itemize}
 \item Age: 23 $\rightarrow$ [21--30]
 \item ZIP Code: 12345 $\rightarrow$ 123**
 \end{itemize}
+more here todo leander. 
+
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
 
