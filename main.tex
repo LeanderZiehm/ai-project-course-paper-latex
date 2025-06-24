@@ -95,9 +95,20 @@ Achieving $k$-anonymity and $l$-diversity typically requires generalization and/
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
 
+
+\section{Architecture}
+\begin{itemize}
+    \item Setup and hardware needed
+    \item Overview diagram of system components
+    \item LLM interface and decision flow
+    \item Form interface for user inputs (direct/quasi identifier tagging)
+    \item Backend anonymization and evaluation pipeline
+\end{itemize}
+
 \section{Related Work}
 This section reviews:
 \begin{itemize}
+     \item The paper where we got the from from
     \item LLM-based anonymization
     \item Rule-based anonymization tools
     \item Human-led anonymization efforts
@@ -114,15 +125,8 @@ Our system allows users to:
 \end{enumerate}
 LLMs are prompted to recommend anonymization strategies based on dataset structure and user inputs. Screenshots and/or GitHub links will be included.
 
-\section{Architecture}
-\begin{itemize}
-    \item Overview diagram of system components
-    \item LLM interface and decision flow
-    \item Form interface for user inputs (direct/quasi identifier tagging)
-    \item Backend anonymization and evaluation pipeline
-\end{itemize}
 
-\section{Evaluation and Experiments}
+\section{Results}
 We test our system on multiple datasets:
 \begin{itemize}
     \item Comparison against human-created anonymization
