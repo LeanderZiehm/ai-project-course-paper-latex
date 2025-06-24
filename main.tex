@@ -20,7 +20,7 @@ We outline key privacy concepts including:
 \begin{itemize}
     \item \textbf{Direct identifiers} (e.g., names, emails)
     \item \textbf{Quasi-identifiers} (e.g., weight, height, age)
-    \item \textbf{Anonymity metrics} such as $k$-Anonymity and $l$-Diversity
+    \item \textbf{Anonymity metrics} such as $k$-Anonymity and $l$-Diversity, t-closeness
 \end{itemize}
 We also introduce user-driven anonymization processes and the limitations of manual or rule-based methods.
 
@@ -109,13 +109,13 @@ The goal is to form equivalence classes with sufficient cardinality and sensitiv
 This section reviews:
 \begin{itemize}
      \item The paper where we got the from from
+     \item Risk analysis papers
     \item LLM-based anonymization
-    \item Rule-based anonymization tools
-    \item Human-led anonymization efforts
+
 \end{itemize}
 We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
 
-\section{Methodology}
+\section{Evaluation}
 Our system allows users to:
 \begin{enumerate}
     \item Upload CSV datasets
@@ -125,8 +125,6 @@ Our system allows users to:
 \end{enumerate}
 LLMs are prompted to recommend anonymization strategies based on dataset structure and user inputs. Screenshots and/or GitHub links will be included.
 
-
-\section{Results}
 We test our system on multiple datasets:
 \begin{itemize}
     \item Comparison against human-created anonymization
@@ -138,7 +136,7 @@ Each configuration is tested 10 times to compute average performance. Evaluation
 \section{Limitations, Discussion, and Future Work}
 \begin{itemize}
     \item Current setup lacks real-time chat interaction for refinement
-    \item Scope limited to $k$-Anonymity and $l$-Diversity; future integration of differential privacy
+    \item Scope limited to $k$-Anonymity and $l$-Diversity and t-closeness; future integration of differential privacy
     \item Broader comparison with more anonymization techniques needed
     \item Challenges in dataset diversity and granularity recommendation
 \end{itemize}
