@@ -89,8 +89,23 @@ where $p_s$ is the fraction of records in the class with sensitive value $s$.
 \end{itemize}
 
 \subsection{Anonymization Methods}
+We summarize several key anonymization techniques, each suited to different data contexts and privacy requirements.
 
-Generalization
+\textbf{Suppression} involves fully removing specific cells or rows from a dataset. It is most suitable for quick removal of extremely sensitive data, especially in open-data publication settings.
+
+\textbf{Generalization} clusters records and replaces each cluster with a representative centroid or more general category. This method is particularly effective for numerical data and statistical summaries and supports privacy models such as $k$-Anonymity and $l$-Diversity. It is often used when preparing datasets for open-data release.
+
+\textbf{Differential Privacy (Global, DP-SGD)} relies on query-based data release mechanisms where calibrated noise is added to the output. It is best suited for machine learning training (e.g., with DP-SGD) and interactive analytics, where a defined privacy budget (e.g., epsilon, delta) must be managed.
+
+\textbf{Differential Privacy (Local)} applies privacy-preserving noise at the individual data record level before data collection. This method is ideal for decentralized or mobile data gathering scenarios, such as collaborative research with privacy guarantees at the point of data generation.
+
+\textbf{Pseudonymization} replaces identifiers with consistent tokens, allowing data to remain linkable while obscuring personally identifiable information. It is often applied for regulatory compliance purposes.
+
+\textbf{Tokenization} substitutes identifiers with cryptographic tokens and may leverage secure multiparty computation techniques. It enables privacy-preserving collaborative analysis and is well-suited for research collaboration contexts.
+
+In addition to these methods, \textbf{homomorphic encryption} offers another avenue for privacy-preserving computation, allowing data to be processed while still encrypted. This enables secure computation without ever revealing the underlying sensitive values.
+
+AGAIN CAN DELETE: Generalization
 
 Achieving $k$-anonymity and $l$-diversity typically requires generalization and/or suppression of quasi-identifier attributes. Generalization replaces specific values with broader categories. For example:
 \begin{itemize}
@@ -101,6 +116,9 @@ more here todo leander.
 
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
+
+
+
 
 
 \section{Architecture}
