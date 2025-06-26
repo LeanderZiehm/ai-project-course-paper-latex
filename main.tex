@@ -8,13 +8,52 @@
 \author{Amin Akziz, Leander Ziehm, Azba Engineer, Santiago}
 \date{April 2025}
 
+\usepackage[a4paper, margin=1in]{geometry}
+
+\usepackage{setspace}
+\onehalfspacing
+
 \begin{document}
 
 \maketitle
 
+\begin{center}
+\begin{minipage}{0.85\textwidth}
+\section*{Abstract}
+The need for anonymizing datasets has grown significantly with the proliferation of machine learning and large language models (LLMs). However, many users lack a clear understanding of how to properly anonymize their data without significantly compromising its utility. In response to this challenge, we present LLMANO-2, a recommender system that leverages LLMs to guide users in anonymizing CSV datasets while preserving predictive performance. Our system provides tailored recommendations based on the specific characteristics of each dataset, aiming to strike a balance between privacy and usability. The motivation for this work stems from recent data privacy incidents that highlight the risks of improper anonymization and the growing demand for practical, intelligent tools to support privacy-aware data publishing.
+\end{minipage}
+\end{center}
+
 \section{Introduction}
-The need for anonymizing datasets has grown significantly with the proliferation of machine learning and large language models (LLMs). However, most users lack a clear understanding of how to properly anonymize their data without significantly reducing its utility. Our work introduces a recommender system that leverages LLMs to guide users in anonymizing CSV datasets while preserving predictive performance. As motivation, we reference recent data privacy incidents that highlight the risks of improper anonymization.
-Motivate why use anoanization: for example for open data in goverment research, ML training, sharing data internaly.
+
+In today’s era of big data and artificial intelligence, vast amounts of personal and sensitive information are being collected and analyzed. This proliferation of data has made dataset anonymization a critical concern, as organizations must protect individual privacy while still deriving value from the data. 
+
+A dataset (for example, a CSV file or database table) typically consists of many records (rows) with multiple attributes (columns) describing each record. These attributes can include direct identifiers (such as names, email addresses, or national ID numbers) as well as indirect identifiers (such as dates of birth, gender, or ZIP codes) that might not identify someone on their own, but could do so when combined with other information.
+
+Data anonymization refers to the process of modifying a dataset to remove or obscure personal identifiers so that individuals cannot be readily identified. In essence, it involves “erasing or encrypting identifiers that connect an individual to stored data,” while ideally retaining the data’s overall usefulness. The goal is to strike a balance between privacy and utility, ensuring that the data remains valuable for analysis or machine learning, but that it no longer reveals private information about individuals.
+
+In practice, anonymization techniques may include removing or masking direct personal identifiers, generalizing values (for example, replacing an exact age with an age range), or pseudonymizing data by replacing real identifiers with artificial codes apart from other techniques. By transforming personal data into a format that cannot be linked to specific individuals, anonymization ensures privacy while allowing organizations to leverage the data for insights.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/figure1.png}
+    \caption{Example of an anonymization technique applied to a simple dataset}
+    \label{fig:anonymization-example}
+\end{figure}
+
+
+This is especially important when sharing datasets with third parties or releasing them publicly for research, as it enables data sharing and collaboration without compromising the confidentiality of the people described by the data. Notably, data anonymization is not just a best practice but often a legal requirement: privacy regulations like the EU’s General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA) mandate that personal data be anonymized or otherwise protected if it’s to be used beyond its original purpose. Failure to properly anonymize data can lead to severe regulatory penalties as well as loss of user trust.
+
+Despite its importance, effective anonymization can be challenging, and previous evidence has shown that improperly anonymized datasets can still compromise privacy. Certain data attributes are extremely sensitive, and even “anonymized” data can be re-identified by clever attackers. A famous statistic by Latanya Sweeney demonstrated that 87\% of the U.S. population could be uniquely identified using only three pieces of information – birth date, gender, and ZIP code – highlighting how a few quasi-identifiers combined together can pinpoint individual.
+
+Another example where personal data was compromised is in the Netflix Prize dataset released in 2006, which contained movie ratings with personal identities removed, researchers were able to re-identify specific users by correlating the anonymized ratings with public information on IMDb (Internet Movie Database). This meant that personal viewing preferences (and even sensitive attributes inferred from them) of certain Netflix users became public, despite Netflix’s attempt to anonymize the data. This meant that personal viewing preferences (and even sensitive attributes inferred from them) of certain Netflix users became public, despite Netflix’s attempt to anonymize the data. 
+
+These cases underscore that simply removing obvious identifiers is often not sufficient, if enough data remains, determined adversaries can link supposedly anonymous records back to real individuals. Beyond the harm to individuals (exposing someone’s health information, financial status, location history, etc.), such incidents also expose organizations to legal liabilities and reputational damage. As data mining and cross-referencing techniques grow more sophisticated in today’s “big data” age, re-identification attacks are becoming easier and more common. This puts pressure on data publishers to adopt stronger anonymization measures than were needed in the past.
+
+At the same time, data anonymization must be done carefully to preserve the usefulness of data. Over-aggressive anonymization (for instance, deleting or randomizing too many fields) can render a dataset nearly useless for analysis or model training, defeating the purpose of sharing the data in the first place. There is an inherent trade-off between privacy and utility: the more information we strip away or distort to protect privacy, the less accurate or insightful the dataset becomes. A core challenge is finding the sweet spot where sensitive personal details are well-protected, yet the anonymized dataset still supports meaningful insights or predictions. Achieving this balance often requires expertise and context, deciding which attributes can be generalized or masked, and to what extent, without overly degrading the data’s integrity. Unfortunately, many users and organizations lack a clear understanding of how to properly anonymize their data to meet this balance. Choosing the right anonymization techniques is not trivial: it depends on the data content, the presence of auxiliary data that attackers might use, and the intended use of the anonymized data. As a result, there is a growing need for tools and guidance to help data owners to navigate this complexity.
+
+Recently, advances in Artificial Intelligence have introduced new possibilities for smarter anonymization approaches. In particular, Large Language Models (LLMs) offer a promising idea to tackle the privacy-utility trade-off. In alignment with these developments, our work proposes LLMANO-2, an LLM-powered anonymization technique based recommender for datasets. LLMANO-2 is designed to assist users in anonymizing tabular datasets by recommending appropriate techniques for each column of data. For a given dataset, the system leverages an LLM to analyze the column contents and identify which fields are likely sensitive and suggest how to transform or mask them. The recommendations aim to maximize privacy protection while minimizing the impact on the dataset’s utility for analysis or machine learning tasks. In the following sections we describe the architecture and methodology behind LLMANO-2, including how it processes datasets, generates anonymization recommendations, and evaluates the effectiveness of those recommendations.
+
 
 
 \section{Background/Theory}
