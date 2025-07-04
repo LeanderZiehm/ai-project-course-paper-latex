@@ -5,8 +5,8 @@
 \usepackage{enumitem}
 
 \title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
-\author{Amin Akziz, Leander Ziehm, Azba Engineer, Santiago Lema}
-\date{April 2025}
+\author{Amin Akziz, Leander Ziehm, Azbabanu Engineer, Santiago Lema}
+\date{July 2025}
 
 \usepackage[a4paper, margin=1in]{geometry}
 
@@ -26,7 +26,7 @@ The need for anonymizing datasets has grown significantly with the proliferation
 
 \section{Introduction}
 
-In today’s era of big data and artificial intelligence, vast amounts of personal and sensitive information are being collected and analyzed. This increase in data collection has made dataset anonymization a critical concern, as organizations must protect individual privacy while still deriving value from the data. 
+In today’s era of big data and artificial intelligence, vast amounts of personal and sensitive information are being collected and analyzed. This increase in data collection has made dataset anonymization a critical concern, as organizations must protect individual privacy while still deriving value from the data.
 
 Notably, data anonymization is not just a best practice but often a legal requirement, privacy regulations like the EU’s General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA) mandate that personal data be anonymized or otherwise protected if it’s to be used beyond its original purpose. Failure to properly anonymize data can lead to severe regulatory penalties as well as loss of user trust.
 
@@ -107,28 +107,116 @@ $$
 
 This ensures that an adversary can not link any given record to fewer than $k$ individuals. However, $k$-anonymity alone does not prevent \textit{attribute disclosure}—when sensitive values within a group are too homogeneous.
 
-\subsection{$l$-Diversity}
+\subsection{$l$-Diversity }
 
-To address the limitations of $k$-anonymity, the notion of \textbf{$l$-diversity} was proposed. It enhances privacy by requiring that each equivalence class (i.e., group of records sharing the same quasi-identifiers) contains at least $l$ "well-represented" values for the sensitive attribute.
+$l$-Diversity extends $k$-anonymity to protect against attribute disclosure by ensuring that each equivalence class has at least $l$ ``well-represented'' sensitive attribute values.
 
-Mathematically, let $S$ be the sensitive attribute. An equivalence class $E$ satisfies \textit{distinct $l$-diversity} if:
+\paragraph{ Definition.}
+An equivalence class $E$ is said to have \textit{distinct $l$-diversity} if it contains at least $l$ distinct values for the sensitive attribute $S$:
 
-$$
-|\{ r[S] \mid r \in E \}| \geq l
-$$
+\[
+|\{ s_i \mid s_i \in E \}| \geq l
+\]
 
-This means that in each equivalence class, there are at least $l$ distinct values for the sensitive attribute.
+where $s_i$ denotes the sensitive value of record $i$ in equivalence class $E$.
 
-More robust variants include:
+\paragraph{Variants.}
 \begin{itemize}
-\item \textbf{Entropy $l$-Diversity}, which requires the entropy of the sensitive attribute distribution in each class to be at least $\log l$:
-$$
--\sum_{s \in S} p_s \log p_s \geq \log l
-$$
-where $p_s$ is the fraction of records in the class with sensitive value $s$.
+    \item \textbf{Distinct $l$-diversity:}
+    \[
+    |\{ s_i \}| \geq l
+    \]
+    Requires at least $l$ distinct sensitive values, regardless of their distribution or meaning.
 
-\item \textbf{Recursive (c, $l$)-Diversity}, which prevents skewness by limiting how dominant the most frequent sensitive value can be.
+    \item \textbf{Entropy $l$-diversity:}
+    Defines diversity using entropy of the sensitive value distribution within $E$:
+    \[
+    H(E) = - \sum_{s \in S} p_s \log p_s \geq \log l
+    \]
+    where $p_s$ is the fraction of records in $E$ with sensitive value $s$. This ensures a balanced distribution.
+
+    \item \textbf{Recursive (c, $l$)-diversity:}
+    Limits the dominance of the most frequent sensitive value. Formally, for the sorted frequencies $f_1, f_2, ..., f_m$:
+    \[
+    f_1 < c \cdot (f_l + f_{l+1} + ... + f_m)
+    \]
+    where $c$ is a parameter controlling strictness. This prevents a single sensitive value from overwhelming others even if there are $l$ distinct values.
 \end{itemize}
+
+\paragraph{Why Needed.}
+While $k$-anonymity prevents identity disclosure, it does not prevent attribute disclosure if all records in an equivalence class share the same sensitive value. $l$-Diversity mitigates this by ensuring diversity in sensitive attributes.
+
+\paragraph{Limitations.}
+\begin{enumerate}
+    \item \textbf{Skewness Attack.} If the overall distribution is skewed (e.g. 99\% flu, 1\% cancer), $l$-diversity fails to prevent inference because the presence of rare values remains revealing.
+
+    \item \textbf{Similarity Attack.} Even if an equivalence class has $l$ distinct sensitive values, if they are semantically similar (e.g. different types of cancer), meaningful privacy is not protected.
+\end{enumerate}
+
+
+\subsection{$t$-Closeness }
+
+$t$-Closeness improves upon $l$-diversity by protecting against attribute disclosure through distributional similarity constraints}.
+
+\paragraph{ Definition.}
+An equivalence class $E$ is said to have \textit{$t$-closeness} if the distance between the distribution of the sensitive attribute within $E$ ($P_E$) and the global distribution ($P_T$) is no more than a threshold $t$:
+
+\[
+D(P_E, P_T) \le t
+\]
+
+where:
+\begin{itemize}
+    \item $P_E$ is the probability distribution of sensitive attribute values in equivalence class $E$
+    \item $P_T$ is the global distribution of the sensitive attribute in the entire dataset
+    \item $D(\cdot)$ is a chosen distance measure, typically Earth Mover's Distance (EMD) or Kullback-Leibler Divergence.
+\end{itemize}
+
+\paragraph{Motivation.}
+$l$-Diversity fails if equivalence class distributions are skewed compared to the overall data, enabling attribute inference attacks. $t$-Closeness mitigates this by bounding the distributional distance.
+
+\paragraph{Common Distance Measures.}
+\begin{itemize}
+    \item \textbf{Earth Mover's Distance (EMD):} Measures the minimum amount of ``work'' required to transform one distribution into another, considering attribute semantics. It is formally defined as:
+    \[
+    EMD(P_E, P_T) = \inf_{\gamma \in \Gamma(P_E, P_T)} \int |x-y| d\gamma(x,y)
+    \]
+    where $\Gamma(P_E, P_T)$ is the set of all joint distributions with marginals $P_E$ and $P_T$.
+
+    \item \textbf{Kullback-Leibler (KL) Divergence:}
+    \[
+    D_{KL}(P_E || P_T) = \sum_{i} p_E(i) \log \frac{p_E(i)}{p_T(i)}
+    \]
+    Note: KL-divergence is asymmetric and unbounded, limiting its practical use in $t$-closeness.
+
+\end{itemize}
+
+\paragraph{Example.}
+If the global distribution is:
+\[
+P_T = \{ \text{Disease A}: 95\%, \text{Disease B}: 5\% \}
+\]
+but an equivalence class $E$ has:
+\[
+P_E = \{ \text{Disease B}: 100\% \}
+\]
+then even with $l$-diversity, an attacker learns an individual's disease with certainty. $t$-Closeness prevents this by ensuring $P_E$ remains close to $P_T$ within threshold $t$.
+
+\paragraph{Advantages.}
+\begin{itemize}
+    \item Addresses both identity and attribute disclosure by enforcing global distribution similarity.
+    \item Reduces risk of skewness and similarity attacks inherent to $l$-diversity.
+\end{itemize}
+
+\paragraph{Limitations.}
+\begin{enumerate}
+    \item \textbf{Utility Loss:} Strict $t$-closeness often requires heavy generalization or suppression, degrading data utility.
+    \item \textbf{Threshold Selection:} Choosing an appropriate $t$ balancing privacy and utility is challenging.
+    \item \textbf{Implementation Complexity:} Calculating EMD for categorical attributes requires defining semantic distances or hierarchies between categories.
+    \item \textbf{Overprotection:} May restrict data utility disproportionately compared to marginal privacy gains in some contexts.
+\end{enumerate}
+
+
 
 \subsection{Anonymization Methods}
 We summarize several key anonymization techniques, each suited to different data contexts and privacy requirements.
@@ -154,14 +242,14 @@ Achieving $k$-anonymity and $l$-diversity typically requires generalization and/
 \item Age: 23 $\rightarrow$ [21--30]
 \item ZIP Code: 12345 $\rightarrow$ 123**
 \end{itemize}
-more here todo leander. 
+more here todo leander.
 
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
 
 
 
-hola
+
 
 \section{Architecture}
 \begin{itemize}
@@ -173,14 +261,109 @@ hola
 \end{itemize}
 
 \section{Related Work}
-This section reviews:
-\begin{itemize}
-     \item The paper where we got the from from
-     \item Risk analysis papers
-    \item LLM-based anonymization
+\subsection{Application of LLM-Assisted Deductive Coding for Fuzzy Matching}
 
+In our system, we implemented a \texttt{fuzzy\_match} function inspired by the deductive coding approach presented by Arnold et al. (2023) in \textit{LLM-Assisted Content Analysis}. Their methodology uses large language models (LLMs) to select a single best-fitting label from multiple predefined options, grounded in context and code definitions. We adapted this technique for robust, scalable option selection tasks in our pipeline.
+
+\subsubsection{How We Used the Technique}
+
+\paragraph{Problem Context}
+Our task required selecting the most appropriate code or label for a given candidate input, from a predefined set of options, based on its meaning within a specific context. This is conceptually identical to deductive coding, where text data is categorized using an established codebook.
+
+\paragraph{Inspiration from the Paper}
+The paper demonstrated that LLMs perform effectively when prompted with:
+\begin{itemize}
+    \item An input text
+    \item A list of options (codes) with clear definitions and examples
+    \item Instructions to select the best fitting option only from the list
 \end{itemize}
-We discuss the differences in our approach, emphasizing interactive recommendation and fine-grained generalization control.
+This structured prompt ensures the LLM leverages its semantic understanding to perform closed-set classification, avoiding invalid or out-of-scope outputs.
+
+\paragraph{Our Implementation}
+In our \texttt{fuzzy\_match} tool:
+\begin{itemize}
+    \item We provide the model with:
+    \begin{itemize}
+        \item A \textbf{context} explaining the selection task
+        \item The \textbf{options dictionary}, mapping each code to its definition
+        \item The \textbf{candidate input} requiring classification
+    \end{itemize}
+    \item We construct a structured prompt instructing the model to select the correct code strictly from the provided options.
+    \item The LLM generates a JSON response containing:
+    \begin{itemize}
+        \item The selected \textbf{code}
+        \item An optional \textbf{rationale} explaining its choice
+    \end{itemize}
+\end{itemize}
+
+This mirrors the paper's method, where the LLM’s reasoning is grounded in the definitions and examples given for each code, allowing it to perform classification based on semantic alignment rather than purely lexical similarity.
+
+\subsubsection{Key Principle Applied}
+
+
+\textbf{Closed-set selection with definitions.} The technique enforces that the output is always within the valid set of codes, ensuring interpretability, consistency, and compatibility with downstream processing pipelines. This is critical for tasks such as qualitative coding, label assignment, or controlled classification where outputs outside the predefined set are invalid.
+
+\subsection{Inspiration from JarviX}
+
+Our LLMANO‑2 system draws inspiration from \textit{JarviX} , a no-code platform for tabular data analytics using LLMs. JarviX elegantly combines structured workflows, prompt-engineering logic, and AutoML integration to guide users through complex analytic tasks. We adopted several of its key design elements:
+
+\begin{itemize}
+    \item \textbf{LLM-driven, context-aware prompt flow.} As in JarviX, our system assesses the dataset schema and user goals to generate guiding questions and suggest relevant next actions dynamically .
+
+    \item \textbf{Missing-context queries.} When crucial information is not provided, LLMANO‑2 automatically asks follow-up questions—mirroring JarviX’s Question Matcher module that detects ambiguity and clarifies requirements before analysis execution.
+    \item \textbf{Future prompt suggestions.} Inspired by JarviX’s Analysis Consultant, which recommends subsequent lines of inquiry and visualizations, LLMANO‑2 likewise offers users a menu of potential follow-up prompts to deepen insight.
+    \item \textbf{Hierarchical system architecture.} We adopted a modular architecture similar to JarviX’s pipeline decomposition—starting from data ingestion, to LLM-driven interpretation, to visualization and optimization—enabling flexible extension and improved maintainability.
+\end{itemize}
+
+\paragraph{Workflow (adapted from JarviX).}
+...............
+
+
+\paragraph{Prompt logic.}
+Let $\mathcal{D}$ be the dataset schema and $u$ the user's initial prompt. JarviX first derives:
+\[
+\mathrm{ctx}_0 = \textit{Parser}(\mathcal{D}, u),
+\]
+then checks completeness:
+\[
+\textit{if } \mathrm{ctx}_0 \not\vdash \textit{sufficient} \text{ then ask }\Delta q,
+\]
+and iterates until $\mathrm{ctx}_k$ is sufficient. The final query is submitted to the LLM for execution. This controlled, looped clarification inspired our back-and-forth logic.
+
+\paragraph{Summary.}
+By adapting JarviX’s workflow, prompt refinement, and suggestion strategies, LLMANO‑2 gains structured dialog management and context-sensitive prompting—key to robust no-code analytics. We extended this foundation with advanced context tracking and conversational capabilities to enhance usability and reliability.
+\subsection{Definitions and Notation Used in LLMANO (Based on SCORR)}
+
+In developing LLMANO, we adopted the definitions, notation conventions, and assumptions from the paper \emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets (SCORR)} . Specifically, we use its classification of Direct Identifiers (DIs), Quasi-Identifiers (QIs), and Sensitive Attributes (SAs), as well as its formal dataset notation and risk analysis assumptions.
+
+\paragraph{Notation.}
+Let $n$ be the number of records, $m$ the number of QI attributes, and $p$ the number of distinct persons:
+\[
+\begin{array}{rl}
+\text{Attributes} &= \{a_1, a_2, \ldots, a_{m+2}\} \\
+\text{Person ID} &= a_1 \\
+\text{QI} &= \{a_2, \ldots, a_{m+1}\} \\
+\text{SA} &= a_{m+2}
+\end{array}
+\]
+where $v_{ij}$ is the value of attribute $a_j$ in record $i$, with:
+\[
+\begin{array}{rl}
+v_{i1} &= u_k \quad \text{(Person ID)} \\
+QI_i &= \{v_{i2}, \ldots, v_{i,m+1}\} \\
+SA_i &= v_{i,m+2}.
+\end{array}
+\]
+
+\paragraph{Assumptions.}
+LLMANO adopts SCORR’s assumptions that:
+\begin{enumerate}
+    \item The intruder knows the QI values of the target data subject.
+    \item The intruder aims to infer the SA value associated with the target.
+\end{enumerate}
+
+\paragraph{Summary.}
+These definitions, notation structures, and assumptions from \emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets} provide the foundation for LLMANO’s identifier recognition logic, privacy metric calculations, and risk analysis modules.
 
 \section{Evaluation}
 Our system allows users to:
@@ -231,35 +414,71 @@ E.~Esser \emph{et~al.},
 }
 
 \bibitem{fake_news_dataset}
-Clément Bisaillon, 
-\emph{Fake and Real News Dataset}. Kaggle. 
+Clément Bisaillon,
+\emph{Fake and Real News Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset}{https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset}
 
 \bibitem{lending_club_dataset}
-Wordsforthewise, 
-\emph{Lending Club Dataset}. Kaggle. 
+Wordsforthewise,
+\emph{Lending Club Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/wordsforthewise/lending-club/data}{https://www.kaggle.com/datasets/wordsforthewise/lending-club/data}
 
 \bibitem{student_demographics_dataset}
-Anıl Gürbüz, 
-\emph{Student Demographics – Online Education Dataset}. Kaggle. 
+Anıl Gürbüz,
+\emph{Student Demographics – Online Education Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/anlgrbz/student-demographics-online-education-dataoulad}{https://www.kaggle.com/datasets/anlgrbz/student-demographics-online-education-dataoulad}
 
 \bibitem{hospital_discharges_dataset}
-Bhautik Mangukiya, 
-\emph{Hospital Inpatient Discharges Dataset}. Kaggle. 
+Bhautik Mangukiya,
+\emph{Hospital Inpatient Discharges Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/bhautikmangukiya12/hospital-inpatient-discharges-dataset}{https://www.kaggle.com/datasets/bhautikmangukiya12/hospital-inpatient-discharges-dataset}
 
 \bibitem{adult_income_dataset}
-UCI Machine Learning Repository, 
-\emph{Adult Census Income Dataset}. Kaggle. 
+UCI Machine Learning Repository,
+\emph{Adult Census Income Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/uciml/adult-census-income/data}{https://www.kaggle.com/datasets/uciml/adult-census-income/data}
 
 \bibitem{titanic_dataset}
-Yasser Hatab, 
-\emph{Titanic Dataset}. Kaggle. 
+Yasser Hatab,
+\emph{Titanic Dataset}. Kaggle.
 \href{https://www.kaggle.com/datasets/yasserh/titanic-dataset}{https://www.kaggle.com/datasets/yasserh/titanic-dataset}
+
+\bibitem{machanavajjhala2007}
+Machanavajjhala, A., Kifer, D., Gehrke, J., and Venkitasubramaniam, M.,
+\emph{$l$-diversity: Privacy beyond $k$-anonymity}. ACM Transactions on Knowledge Discovery from Data (TKDD), 1(1), 2007.
+\href{https://doi.org/10.1145/1217299.1217302}{https://doi.org/10.1145/1217299.1217302}
+
+\bibitem{li2007tcloseness}
+Li, N., Li, T., and Venkatasubramanian, S.,
+\emph{$t$-Closeness: Privacy beyond $k$-anonymity and $l$-diversity}. In Proceedings of the 23rd International Conference on Data Engineering (ICDE), 2007, pp. 106–115.
+\href{https://doi.org/10.1109/ICDE.2007.367856}{https://doi.org/10.1109/ICDE.2007.367856}
+
+\bibitem{fung2010survey}
+Fung, B. C. M., Wang, K., Chen, R., and Yu, P. S.,
+\emph{Privacy-preserving data publishing: A survey of recent developments}. ACM Computing Surveys (CSUR), 42(4), 2010, Article 14.
+\href{https://doi.org/10.1145/1749603.1749605}{https://doi.org/10.1145/1749603.1749605}
+
+
+
+
+
+\bibitem{llm_content_analysis}
+Gong, M., Choudhury, S. R., Jiang, M., He, Y., Meng, Y., Li, X., Zhang, C., and Liu, H.,
+\emph{LLM-Assisted Content Analysis: Demonstration and Evaluation}. arXiv preprint arXiv:2306.14924, 2023.
+\href{https://arxiv.org/abs/2306.14924}{https://arxiv.org/abs/2306.14924}
+
+\bibitem{scorr_paper}
+Folz, J., Vidanalage, M. D., Aufschläger, R., Almaini, A., Heigl, M., Fiala, D., and Schramm, M.,
+\emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets}. IEEE Access, 2025.
+\href{https://ieeexplore.ieee.org/document/10973096}{https://ieeexplore.ieee.org/document/10973096}
+
+\bibitem{jarvix}
+Liu, S., Ji, Y., Tan, S., Zhang, J., Zhao, W., Liu, S., Chen, M., and Hu, Z.,
+\emph{JarviX: An LLM No-code Platform for Tabular Data Analysis and Optimization}. arXiv preprint arXiv:2312.02213, 2023.
+\href{https://arxiv.org/abs/2312.02213}{https://arxiv.org/abs/2312.02213}
+
 
 
 \end{thebibliography}
 \end{document}
+
