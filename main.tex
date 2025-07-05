@@ -50,15 +50,15 @@ In practice, anonymization techniques may include removing or masking direct per
 
 This is especially important when sharing datasets with third parties or releasing them publicly for research, as it enables data sharing and collaboration without compromising confidentiality.
 
-Despite its importance, effective anonymization can be challenging. Research has shown that improperly anonymized datasets can still compromise privacy. Certain attributes are extremely sensitive, and even "anonymized" data can be re-identified. A famous statistic by Latanya Sweeney demonstrated that 87\% of the U.S. population could be uniquely identified using only three pieces of information – birth date, gender, and ZIP code – highlighting how a few quasi-identifiers can pinpoint individuals.
+Despite its importance, effective anonymization can be challenging. Research has shown that improperly anonymized datasets can still compromise privacy. Certain attributes are extremely sensitive, and even "anonymized" data can be re-identified. A famous statistic by Latanya Sweeney demonstrated that 87\% of the U.S. population could be uniquely identified using only three pieces of information, birth date, gender, and ZIP code, highlighting how a few quasi-identifiers can pinpoint individuals.
 
 Another example where personal data was compromised is in the Netflix Prize dataset released in 2006, which contained movie ratings with personal identities removed, researchers were able to re-identify specific users by correlating the anonymized ratings with public information on IMDb (Internet Movie Database). This meant that personal viewing preferences (and even sensitive attributes inferred from them) of certain Netflix users became public, despite Netflix’s attempt to anonymize the data.
 
 These cases show that simply removing obvious identifiers is often not sufficient. If enough data remains, determined adversaries can link supposedly anonymous records back to real individuals. Beyond the harm to individuals (such as exposing health information, financial status, or location history), such incidents expose organizations to legal liabilities and reputational damage. As data mining and cross-referencing techniques grow more sophisticated, re-identification attacks are becoming easier and more common. This puts pressure on data publishers to adopt stronger anonymization measures than were needed in the past.
 
-At the same time, anonymization must be done carefully to preserve the usefulness of data. Over-aggressive anonymization—such as deleting or randomizing too many fields—can render a dataset nearly useless for analysis or model training, defeating the purpose of sharing the data. The more we strip away or distort to protect privacy, the less accurate or insightful the dataset becomes. A core challenge is finding the sweet spot where sensitive details are well-protected, yet the dataset still supports meaningful insights or predictions.
+At the same time, anonymization must be done carefully to preserve the usefulness of data. Over-aggressive anonymization, such as deleting or randomizing too many fields, can render a dataset nearly useless for analysis or model training, defeating the purpose of sharing the data. The more we strip away or distort to protect privacy, the less accurate or insightful the dataset becomes. A core challenge is finding the sweet spot where sensitive details are well-protected, yet the dataset still supports meaningful insights or predictions.
 
-Achieving this balance often requires expertise and context—deciding which attributes to generalize or mask, and to what extent, without degrading the data’s integrity. Unfortunately, many users and organizations lack a clear understanding of how to achieve this. Choosing the right anonymization techniques depends on the data content, possible auxiliary data an attacker may use, and the intended use of the anonymized dataset. As a result, there is a growing need for tools and guidance to help data owners navigate this complexity.
+Achieving this balance often requires expertise and context, deciding which attributes to generalize or mask, and to what extent, without degrading the data’s integrity. Unfortunately, many users and organizations lack a clear understanding of how to achieve this. Choosing the right anonymization techniques depends on the data content, possible auxiliary data an attacker may use, and the intended use of the anonymized dataset. As a result, there is a growing need for tools and guidance to help data owners navigate this complexity.
 
 ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -156,8 +156,7 @@ While $k$-anonymity prevents identity disclosure, it does not prevent attribute 
 
 \subsection{$t$-Closeness }
 
-$t$-Closeness improves upon $l$-diversity by protecting against attribute disclosure through distributional similarity constraints}.
-
+$t$-Closeness improves upon $l$-diversity by protecting against attribute disclosure through distributional similarity constraints.
 \paragraph{ Definition.}
 An equivalence class $E$ is said to have \textit{$t$-closeness} if the distance between the distribution of the sensitive attribute within $E$ ($P_E$) and the global distribution ($P_T$) is no more than a threshold $t$:
 
