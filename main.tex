@@ -156,7 +156,7 @@ While $k$-anonymity prevents identity disclosure, it does not prevent attribute 
 
 \subsection{$t$-Closeness }
 
-$t$-Closeness improves upon $l$-diversity by protecting against attribute disclosure through distributional similarity constraints}.
+$t$-Closeness improves upon $l$-diversity by protecting against attribute disclosure through distributional similarity constraints.
 
 \paragraph{ Definition.}
 An equivalence class $E$ is said to have \textit{$t$-closeness} if the distance between the distribution of the sensitive attribute within $E$ ($P_E$) and the global distribution ($P_T$) is no more than a threshold $t$:
@@ -247,18 +247,73 @@ more here todo leander.
 
 The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
 
-
-
-
-
 \section{Architecture}
-\begin{itemize}
-    \item Setup and hardware needed
-    \item Overview diagram of system components
-    \item LLM interface and decision flow
-    \item Form interface for user inputs (direct/quasi identifier tagging)
-    \item Backend anonymization and evaluation pipeline
-\end{itemize}
+\label{sec:architecture}
+
+\subsection{Design rationale}
+
+LLMANO is meant to operate as an on-premise, language-centric assistant that guides non-experts through the anonymisation of tabular datasets.  Consequently the system must (i) accept queries in natural language, (ii) ingest a spreadsheet-like file, (iii) perform an automatic privacy screening before any user action, and (iv) expose a set of callable tools so the language model can compute metrics such as $k$-anonymity or $l$-diversity on demand.  These requirements favour a modular architecture: new capabilities should be added with minimal friction and without touching unrelated modules.  Expansion, for example adding a fresh privacy tool, must not require edits to the integration of the LLMs in the pipeline.  Open-source frameworks are preferred throughout; while the large language model itself may be commercial, the current build already includes an Ollama adapter that can point to a fully self-hosted model, yielding a pipeline that is open from end to end.
+
+The platform is model-agnostic.  A thin abstract class, \texttt{BaseLLM}, exposes only the primitive operations needed by the rest of the application—token streaming, temperature control, and a low-level function call interface.  Concrete subclasses, here called adapters, encapsulate every provider-specific nuance, from authentication to tool-calling syntax.  Whenever a new model is required, the developer implements a single adapter; the surrounding code remains unchanged, and the user can switch models at run time.  Higher-level helpers such as \texttt{fuzzy\_match} are implemented \emph{outside} \texttt{BaseLLM} and rely exclusively on those primitive methods, so they work identically with every adapter.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/class_diagram.pdf}
+    \caption{Class diagram of \texttt{BaseLLM}, adapters, engine and orchestrator.}
+    \label{fig:class-diagram}
+\end{figure}
+
+\subsection{Hardware notes}
+
+Because the platform delegates inference to whichever model the user selects, resource consumption scales with parameter count.  All experiments so far have been conducted on Linux.  A local 8-billion-parameter Llama runs successfully on CPU, though latency is noticeable; GPU acceleration or a smaller checkpoint is advisable for interactive use.  Section~\ref{evaluation} reports measured runtimes.
+
+\subsection{LLM-mediated decisions}
+
+Balancing rich prompts against atomic decisions proved delicate.  Prior work shows that large language models perform well when deductively coding text against a fixed codebook~\cite{llm_content_analysis}.  We therefore implemented a helper, \texttt{fuzzy\_match}, which accepts (i) a natural-language context, (ii) a dictionary of codes, and (iii) the candidate attribute together with sample values.  The model must return the best-matching code.  This mechanism tags each column as a direct identifier (\texttt{DI}), quasi-identifier (\texttt{QI}), sensitive attribute (\texttt{SA}) or non-identifier (\texttt{NI}) and later chooses an appropriate anonymisation technique.  As observed by Chew~et~al., refining the code definitions with the same LLM improves downstream accuracy, a pattern repeated here.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lp{0.75\linewidth}}
+        \hline
+        \textbf{Code} & \textbf{Definition}\\
+        \hline
+        DI & Direct identifiers that, by themselves, uniquely identify an individual.\\
+        QI & Quasi-identifiers that enable re-identification only in combination with other data.\\
+        SA & Sensitive attributes whose disclosure is harmful even without explicit identity.\\
+        NI & Attributes that cannot reasonably re-identify an individual, even in combination.\\
+        \hline
+    \end{tabular}
+    \caption{Example codebook (simplified) used by \texttt{fuzzy\_match}.}
+    \label{tab:fuzzy-codebook}
+\end{table}
+
+Several approaches were tested to ensure the model returned well-formed data.  Embedding the target schema directly in the prompt produced unstable results; adding iterative validation loops improved reliability but quickly cluttered the adapters.  The final solution adopts LangChain’s structured-output feature: replies are validated against a \texttt{Pydantic} model such as
+\begin{verbatim}
+class FuzzyMatchResponse(BaseModel):
+    code: str
+    rationale: str | None
+\end{verbatim}
+This approach yields consistent parsing while keeping the adapters concise and remains fully open-source.
+
+\subsection{Workflow}
+
+The anonymization session begins with an intake form in which the user states the analysis goal, their existing knowledge of the dataset and any columns of particular concern.  The platform then inspects the file, extracts five representative rows plus summary statistics and forwards both dataset and form content to the model.  The first reply is a brief overview of the data; the second comprises one classification call per column, followed by anonymisation recommendations derived from an internal knowledge base.  Results are rendered as a colour-coded table—red for \texttt{DI}, yellow for \texttt{QI} and blue for \texttt{SA}—and accompanied by a concise markdown report.
+
+Once the initial analysis is complete the system enters a conversational loop.  Each user query passes through the active adapter.  If the request references an implemented metric (for example \(k\)-anonymity), the adapter calls the matching Python routine and embeds the result in the reply.  After every turn the model proposes three plausible follow-up questions, using the full dialogue as context.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/workflow_diagram.pdf}
+    \caption{End-to-end workflow of LLMANO.}
+    \label{fig:workflow-diagram}
+\end{figure}
+
+The output presented to the user consists of the chat transcript, the coloured table head and a recommendation pane listing a suggested anonymisation method for every non-\texttt{NI} column.
+
+\subsection{Summary}
+
+The architecture satisfies the original design goals: it runs on-premise, ingests tabular data, performs an automatic privacy audit and answers natural-language questions.  Modularity is maintained through an adapter layer that isolates provider details, while structured outputs guarantee that the application receives well-formed data.  The resulting system can be extended, audited and deployed without risking exposure of raw, non-anonymised records.
+
 
 \section{Related Work}
 \subsection{Application of LLM-Assisted Deductive Coding for Fuzzy Matching}
@@ -365,7 +420,7 @@ LLMANO adopts SCORR’s assumptions that:
 \paragraph{Summary.}
 These definitions, notation structures, and assumptions from \emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets} provide the foundation for LLMANO’s identifier recognition logic, privacy metric calculations, and risk analysis modules.
 
-\section{Evaluation}
+\section{Evaluation} \label{evaluation}
 Our system allows users to:
 \begin{enumerate}
     \item Upload CSV datasets
