@@ -268,7 +268,7 @@ Because the platform delegates inference to whichever model the user selects, re
 
 \subsection{LLM-mediated decisions}
 
-Balancing rich prompts against atomic decisions proved delicate.  Prior work shows that large language models perform well when deductively coding text against a fixed codebook~\cite{llm_content_analysis}.  We therefore implemented a helper, \texttt{fuzzy\_match}, which accepts (i) a natural-language context, (ii) a dictionary of codes, and (iii) the candidate attribute together with sample values.  The model must return the best-matching code.  This mechanism tags each column as a direct identifier (\texttt{DI}), quasi-identifier (\texttt{QI}), sensitive attribute (\texttt{SA}) or non-identifier (\texttt{NI}) and later chooses an appropriate anonymisation technique.  As observed by Chew~et~al., refining the code definitions with the same LLM improves downstream accuracy, a pattern repeated here.
+Balancing rich prompts against atomic decisions proved delicate.  Prior work shows that large language models perform well when deductively coding text against a fixed codebook~\cite{llm_content_analysis}.  We therefore implemented a helper, \texttt{fuzzy\_match}, which accepts (i) a natural-language context, (ii) a dictionary of codes, and (iii) the candidate attribute together with sample values.  The model must return the best-matching code.  This mechanism tags each column as a direct identifier (\texttt{DI}), quasi-identifier (\texttt{QI}), sensitive attribute (\texttt{SA}) or non-identifier (\texttt{NI}) and later chooses an appropriate anonymisation technique.  As observed by Chew \textit{et al.}~\cite{llm_content_analysis}, refining the code definitions with the same LLM improves downstream accuracy, a pattern repeated here.
 
 \begin{table}[h]
     \centering
@@ -437,16 +437,32 @@ We test our system on multiple datasets:
 \end{itemize}
 Each configuration is tested 10 times to compute average performance. Evaluation is automated and requires no user interaction.
 
-\section{Limitations, Discussion, and Future Work}
+\section{Discussion}
+\subsection{Limitations}
+\label{sec:limitations}
+
+The present prototype demonstrates the feasibility of an LLM–assisted anonymisation workflow, yet several constraints remain.  
+First, the system relies on multiple, narrowly scoped prompts to achieve stable results.  Each additional prompt increases latency and, when a commercial model is used, raises monetary cost through higher token throughput.  A production deployment will therefore require a careful balance between prompt granularity and operational expense.  
+
+Second, although the architecture permits arbitrary Python tools to be exposed to the language model, only a small set is currently implemented, limited to basic privacy metrics such as $k$-anonymity and $l$-diversity.  Expanding this library is essential for broader applicability.  
+
+Third, the range of supported anonymisation techniques is still narrow.  At present the system can recommend generalisation, suppression and a differential-privacy layer, but it cannot yet prescribe more advanced transformations such as homomorphic encryption, local differential privacy or synthetic data generation.  A systematic comparison with these alternatives is left for future work.  
+
+Finally, the current output is minimal.  Results appear only as a simple, chat-independent box that lists one suggested anonymisation method per attribute, and they are not yet downloadable in any report format.  The box is meant as a symbolic placeholder for a richer document that the LLM will ultimately compose, containing a narrative summary, detailed rationale and actionable next steps.  Implementing export functions and an editable report view remains future work.
+
+\subsection{Future work}
 \begin{itemize}
-    \item Current setup lacks real-time chat interaction for refinement
-    \item Scope limited to $k$-Anonymity and $l$-Diversity and t-closeness; future integration of differential privacy
-    \item Broader comparison with more anonymization techniques needed
-    \item Challenges in dataset diversity and granularity recommendation
+    \item bright future
 \end{itemize}
 
 \section{Conclusion}
-We presented a prototype LLM-powered anonymization recommender that assists users in balancing privacy with data utility. Our system enables informed anonymization decisions and shows promise compared to existing approaches. Future enhancements will include conversational interfaces and broader evaluation.
+\label{sec:conclusion}
+
+This report presented LLMANO, a prototype that couples large language models with a lightweight, modular framework for column-level anonymisation guidance.  The system accepts a CSV dataset, applies an automatic screening based on a fixed codebook, and proposes one anonymisation strategy per attribute.  All components are deployable on-premise; integration of new language models or privacy tools requires only the implementation of an additional adapter.
+
+The current implementation remains limited.  Only three anonymisation techniques—generalisation, suppression and a differential-privacy layer—are supported, and the tool library covers basic risk metrics. Addressing these constraints, extending the set of privacy routines and adding export functionality constitute clear next steps.
+
+Even with these restrictions, the prototype validates the feasibility of an LLM-assisted workflow that keeps raw data local and separates provider detail from core logic.  The design can therefore serve as a starting point for more comprehensive, open-source solutions in future work.
 
 
 \begin{thebibliography}{9}
