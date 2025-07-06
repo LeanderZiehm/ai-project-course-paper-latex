@@ -60,20 +60,12 @@ At the same time, anonymization must be done carefully to preserve the usefulnes
 
 Achieving this balance often requires expertise and context, deciding which attributes to generalize or mask, and to what extent, without degrading the data’s integrity. Unfortunately, many users and organizations lack a clear understanding of how to achieve this. Choosing the right anonymization techniques depends on the data content, possible auxiliary data an attacker may use, and the intended use of the anonymized dataset. As a result, there is a growing need for tools and guidance to help data owners navigate this complexity.
 
-------------------------------------------------------------------------------------------------------------------------------------
 
-\begin{itemize}
-\item \textbf{Direct identifiers} (e.g., names, emails)
-\item \textbf{Quasi-identifiers} (e.g., weight, height, age)
-\item \textbf{Anonymity metrics} such as $k$-Anonymity, $l$-Diversity, and $t$-Closeness
-\item \textbf{Anonymization Methods}
-\end{itemize}
-
-We also discuss user-driven anonymization processes and the limitations of manual or rule-based methods in ensuring privacy. In the remainder of this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, including $k$-anonymity, $l$-diversity, and generalization strategies.
 
 \subsection{Identifiers and Quasi-Identifiers}
 
-In the context of privacy-preserving data analysis, it is essential to distinguish between different types of attributes:
+To give a broader context, we first define key terms related to data anonymization.
+\textbf{Identifiers} are attributes in a dataset that can be used to uniquely identify an individual. They can be classified into two main categories:
 
 \begin{itemize}
 \item \textbf{Direct Identifiers} are attributes that can uniquely identify an individual without external information. Common examples include names, social security numbers, or email addresses.
@@ -81,7 +73,26 @@ In the context of privacy-preserving data analysis, it is essential to distingui
 \item \textbf{Indirect Identifiers}, also called \textit{quasi-identifiers}, are attributes that do not uniquely identify an individual on their own but can do so when combined with other quasi-identifiers. Examples include age, ZIP code, and gender.
 \end{itemize}
 
-Effective anonymization techniques aim to remove or transform these identifiers such that the risk of re-identification is minimized.
+
+
+
+\subsection{Anonymization Techniques}
+
+Several anonymization techniques have been developed to reduce the risk of re-identification while maintaining the utility of data. These techniques vary in complexity and suitability depending on the nature of the dataset and the privacy requirements.
+
+\begin{itemize}
+\item \textbf{Suppression} involves removing data entirely from a dataset. For example, if a particular ZIP code is too rare and could identify someone, it might be deleted or replaced with a placeholder (e.g., “***”). This method is straightforward but can result in significant data loss if overused.
+
+\item \textbf{Generalization} replaces specific values with broader categories. For instance, replacing an exact age of 29 with an age range such as “20–30,” or converting a full date of birth into just a year. Generalization helps reduce uniqueness in the data and is often used in combination with other techniques.
+
+\item \textbf{Differential Privacy} takes a different approach by introducing mathematical noise to the data or the results of queries on the data. It provides strong theoretical guarantees that the inclusion or exclusion of a single individual’s data does not significantly affect the output, making it extremely difficult to infer information about any individual. Differential privacy is especially useful in scenarios involving aggregate data analysis or interactive queries.
+
+\end{itemize}
+
+These techniques are often used in combination and must be tailored to the specific context of the dataset. The choice of technique involves trade-offs between privacy protection and data utility, and selecting the appropriate method requires a clear understanding of the risks, the data's structure, and its intended use.
+
+
+We also discuss user-driven anonymization processes and the limitations of manual or rule-based methods in ensuring privacy. In the remainder of this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, including $k$-anonymity, $l$-diversity, and generalization strategies.
 
 \subsection{$k$-Anonymity}
 
@@ -216,35 +227,6 @@ then even with $l$-diversity, an attacker learns an individual's disease with ce
 \end{enumerate}
 
 
-
-\subsection{Anonymization Methods}
-We summarize several key anonymization techniques, each suited to different data contexts and privacy requirements.
-
-\textbf{Suppression} involves fully removing specific cells or rows from a dataset. It is most suitable for quick removal of extremely sensitive data, especially in open-data publication settings.
-
-\textbf{Generalization} clusters records and replaces each cluster with a representative centroid or more general category. This method is particularly effective for numerical data and statistical summaries and supports privacy models such as $k$-Anonymity and $l$-Diversity. It is often used when preparing datasets for open-data release.
-
-\textbf{Differential Privacy (Global, DP-SGD)} relies on query-based data release mechanisms where calibrated noise is added to the output. It is best suited for machine learning training (e.g., with DP-SGD) and interactive analytics, where a defined privacy budget (e.g., epsilon, delta) must be managed.
-
-\textbf{Differential Privacy (Local)} applies privacy-preserving noise at the individual data record level before data collection. This method is ideal for decentralized or mobile data gathering scenarios, such as collaborative research with privacy guarantees at the point of data generation.
-
-\textbf{Pseudonymization} replaces identifiers with consistent tokens, allowing data to remain linkable while obscuring personally identifiable information. It is often applied for regulatory compliance purposes.
-
-\textbf{Tokenization} substitutes identifiers with cryptographic tokens and may leverage secure multiparty computation techniques. It enables privacy-preserving collaborative analysis and is well-suited for research collaboration contexts.
-
-In addition to these methods, \textbf{homomorphic encryption} offers another avenue for privacy-preserving computation, allowing data to be processed while still encrypted. This enables secure computation without ever revealing the underlying sensitive values.
-
-AGAIN CAN DELETE: Generalization
-
-Achieving $k$-anonymity and $l$-diversity typically requires generalization and/or suppression of quasi-identifier attributes. Generalization replaces specific values with broader categories. For example:
-\begin{itemize}
-\item Age: 23 $\rightarrow$ [21--30]
-\item ZIP Code: 12345 $\rightarrow$ 123**
-\end{itemize}
-more here todo leander.
-
-
-The goal is to form equivalence classes with sufficient cardinality and sensitive attribute diversity, while minimizing information loss.
 
 \section{Architecture}
 \label{sec:architecture}
@@ -451,9 +433,26 @@ Third, the range of supported anonymisation techniques is still narrow.  At pres
 Finally, the current output is minimal.  Results appear only as a simple, chat-independent box that lists one suggested anonymisation method per attribute, and they are not yet downloadable in any report format.  The box is meant as a symbolic placeholder for a richer document that the LLM will ultimately compose, containing a narrative summary, detailed rationale and actionable next steps.  Implementing export functions and an editable report view remains future work.
 
 \subsection{Future work}
-\begin{itemize}
-    \item bright future
-\end{itemize}
+
+Although LLMANO-2 already provides a flexible and modular setup for LLM-assisted anonymization, there is still plenty of room to grow and improve. Two areas stand out as especially promising for future development which are integrating open-source agentic frameworks, and moving away from heavy prompt engineering in favor of Retrieval-Augmented Generation (RAG) to support more scalable and efficient reasoning.
+
+\paragraph{Agentic Orchestration and Structured LLM Tooling.}
+As LLMs become more deeply embedded in structured applications, there is growing momentum behind the so called “agentic” systems. Setups where models do not just respond to prompts, but also take initiative, call tools, and manage multi-step workflows. Open-source frameworks like LangChain and CrewAI make this kind of functionality much easier to implement. For LLMANO-2, a natural next step would be to adopt these frameworks to handle tool-calling and decision-making more explicitly. Features like LangChain’s StructuredOutput and StateGraph could allow the system to coordinate complex tasks, such as risk analysis, column classification, and technique selection in a clean, modular way. This would move the workflow beyond a simple sequence of prompts into a flexible decision graph, making it easier to track, reuse, and extend each step of the process.
+
+In addition, structured function-calling, supported by LangChain and similar agentic frameworks, lets us enforce strict output formats in a way that simple prompt validation often can not. This shifts the role of the LLM from just a reasoning engine to something closer to a programmable agent that can reliably carry out specific steps in the anonymization workflow. With tool-calling, the model could directly trigger external components like homomorphic encryption libraries or advanced generalization tools, without needing to encode all the logic in the prompt itself. This kind of structured setup fits well with modern hybrid AI practices, where symbolic routines and modular code work alongside probabilistic models to create more reliable and maintainable systems \cite{jarvix}.
+
+\paragraph{From Prompting to Retrieval-Augmented Generation (RAG).}
+Currently, LLMANO-2 depends heavily on carefully crafted prompts to guide its anonymization logic and provide context. While this approach has produced good results, it is also resource intensive, both in terms of token usage and the effort needed to maintain the prompts. A more scalable alternative is Retrieval-Augmented Generation (RAG), which separates the retrieval of relevant information from the actual generation process. Instead of packing all the logic into a single prompt, a RAG-based system can pull in relevant anonymization strategies, definitions, and examples from a vector store, allowing the model to work with just the most useful context for each task.
+
+In a RAG-based setup, the choice of which anonymization method to use would be informed by embedded representations of past successful cases, legal requirements, and established best practices, all stored in a well curated knowledge base. This approach is especially useful when working across different domains like healthcare, finance, or education, where privacy expectations can vary widely. Tools like FAISS \cite{faiss2023} or Chroma can serve as the vector search engine behind this, enabling the system to retrieve relevant context without being limited by token constraints. Combined with LLM reasoning, this setup can improve both accuracy and reliability by grounding the model’s output in meaningful, domain-specific information \cite{llm_content_analysis}.
+
+Adopting a RAG-based architecture would also make the system more modular. Domain-specific privacy guidelines could be stored in separate knowledge bases, allowing the model to retrieve only what’s relevant for each context, without needing to retrain or manually tweak prompt templates. This is particularly helpful when dealing with evolving regulations, like updates to GDPR interpretations, since changes can be made directly in the documents rather than in the application code.
+
+\paragraph{Summary.}
+Agentic orchestration and RAG complement each other well and offer solutions to two of LLMANO-2’s current limitations, its reliance on linear prompt flows and the brittleness of static prompt design. By combining tool-based reasoning with modular knowledge retrieval, the system could become more robust, easier to interpret, and better suited for scaling. These improvements would also support more interactive, human-in-the-loop workflows, where users can review, adjust, or fine-tune anonymization steps based on clear intermediate outputs.
+
+Ultimately, future versions of LLMANO should aim to move beyond static prompt execution and become proactive, memory-enhanced agents capable of retrieving context on demand, planning anonymization strategies, calling tools as needed, and adapting flexibly to new domains and evolving privacy requirements.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
