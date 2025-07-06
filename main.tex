@@ -3,6 +3,8 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{enumitem}
+\usepackage{booktabs}
+
 
 \title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
 \author{Amin Akziz, Leander Ziehm, Azbabanu Engineer, Santiago Lema}
@@ -402,22 +404,83 @@ LLMANO adopts SCORR’s assumptions that:
 These definitions, notation structures, and assumptions from \emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets} provide the foundation for LLMANO’s identifier recognition logic, privacy metric calculations, and risk analysis modules.
 
 \section{Evaluation} \label{evaluation}
-Our system allows users to:
-\begin{enumerate}
-    \item Upload CSV datasets
-    \item Select columns as direct or quasi-identifiers (form includes definitions and examples)
-    \item Receive LLM-generated anonymization recommendations (e.g., $k=10$)
-    \item Optionally adjust granularity and generalization steps
-\end{enumerate}
-LLMs are prompted to recommend anonymization strategies based on dataset structure and user inputs. Screenshots and/or GitHub links will be included.
 
-We test our system on multiple datasets:
-\begin{itemize}
-    \item Comparison against human-created anonymization
-    \item Benchmarking against other anonymization algorithms
-    \item Metrics: preservation of predictive accuracy, anonymity scores
-\end{itemize}
-Each configuration is tested 10 times to compute average performance. Evaluation is automated and requires no user interaction.
+
+We conducted our evaluation by comraring the LLMs classifications to our own annotations as our benchmark. As we are not anonymisation experts we optet to validate and agree on annotations as a team. Through discussion and 4 different opinions we aim to make this evaluation more robust. Another notable part of our evaluation is that the anotators are not allowed to use external tools like pandas to get additional information aboout the dataset. They are only alowed to use the json that is provided to them. The json contains the same information that the LLM gets as a input. This approach was choses to make sure that the human anotators don't have and external unfair advantage against the llm ans and the LLM. 
+
+
+\section*{LLM Analissi algorithm}
+
+
+I THINK THIS MIGHT BE REPEATED IF SOMEONE ALREDY TALKED ABOUT THE ALGORITOM BEFORE:
+
+2 to identify direct identifiers, quasi-identifiers, non-identifiers, and sensitive attributes. The classification is based on definitions and guidelines from sources one, two, three, and four.
+
+This is the first step of the process. The second step involves classification again, but this time in support of anonymization strategies. For normalization methods, we chose generalization for this paper. We also incorporated suppression as an anonymization method. Additionally, differential privacy was included, as it was requested by the professor. Thus, these three—generalization, suppression, and differential privacy—make up our anonymization options.
+
+The LLM receives the form, when available, as context. If no form is provided, this context remains empty. No extra text is added in our example; instead, all columns in the dataset are selected as important.
+
+Two approaches are tested, including one using machine learning. The dataset is made publicly available. The language model receives the dataset and its description. For each column, a summary prompt is generated. First, the LLM summarizes the dataset. Then, it processes all columns and extracts either all unique values or, if there are too many, a maximum of 20 unique values to avoid overloading the context.
+
+The LLM then classifies whether a column is a direct identifier, quasi-identifier, sensitive attribute, or non-identifier. This classification is made using the column name, the unique values, the dataset summary, and user context from the form. The output consists of the classification label and a rationale.
+
+In the second step, the anonymization purpose is extracted from the form, if available. This, along with the column name, sample values, and classification, is passed to the LLM. The model selects one of the anonymization methods: generalization, suppression, differential privacy, or none.
+
+The prompt instructs the model to take on the role of a data privacy expert advising a user on how to reduce re-identification risk in the dataset. For each column that is considered a risk attribute, the LLM must suggest in one concise sentence how an organization can apply an anonymization method or technique.
+
+Thus, the process involves a classification step followed by an explanation step that recommends how to apply anonymization.
+
+
+
+
+
+The findings are that XXX.
+
+
+\section*{LLM Evaluation Against Human-Labeled Gold Standard}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Purpose} & \textbf{Model} & \textbf{Accuracy} & \textbf{F1 Score} \\
+\midrule
+Titanic Dataset & Public & gpt-4o-mini             & 0.91 & 0.88 \\
+          &           & gemini-1.5-flash-latest & 0.89 & 0.85 \\
+          &           & llama3-70b-8192         & 0.90 & 0.87 \\
+          &           & gemma3                  & 0.87 & 0.83 \\
+\midrule
+Cencus Dataset & ML Training & gpt-4o-mini             & 0.88 & 0.86 \\
+          &           & gemini-1.5-flash-latest & 0.86 & 0.82 \\
+          &           & llama3-70b-8192         & 0.87 & 0.85 \\
+          &           & gemma3                  & 0.84 & 0.80 \\
+\midrule
+Cencus Dataset  & Public & gpt-4o-mini             & 0.89 & 0.87 \\
+          &           & gemini-1.5-flash-latest & 0.87 & 0.84 \\
+          &           & llama3-70b-8192         & 0.88 & 0.86 \\
+          &           & gemma3                  & 0.85 & 0.81 \\
+\midrule
+Cencus Dataset  & ML Training & gpt-4o-mini             & 0.86 & 0.83 \\
+          &           & gemini-1.5-flash-latest & 0.84 & 0.80 \\
+          &           & llama3-70b-8192         & 0.85 & 0.82 \\
+          &           & gemma3                  & 0.82 & 0.78 \\
+\midrule
+Adult Dataset & Public & gpt-4o-mini             & 0.93 & 0.91 \\
+          &           & gemini-1.5-flash-latest & 0.90 & 0.88 \\
+          &           & llama3-70b-8192         & 0.92 & 0.90 \\
+          &           & gemma3                  & 0.89 & 0.85 \\
+\midrule
+Adult Dataset & ML Training & gpt-4o-mini             & 0.91 & 0.89 \\
+          &           & gemini-1.5-flash-latest & 0.88 & 0.85 \\
+          &           & llama3-70b-8192         & 0.90 & 0.88 \\
+          &           & gemma3                  & 0.87 & 0.84 \\
+\bottomrule
+\end{tabular}
+\caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
+\label{tab:llm_eval}
+\end{table}
+\newpage
 
 \section{Discussion}
 \subsection{Limitations}
