@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{enumitem}
 \usepackage{booktabs}
+\usepackage{multirow}
 
 
 \title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
@@ -442,44 +443,56 @@ The findings are that XXX.
 \begin{table}[h!]
 \centering
 \small
-\begin{tabular}{llcccc}
+\begin{tabular}{lllccl}
 \toprule
-\textbf{Dataset} & \textbf{Purpose} & \textbf{Model} & \textbf{Accuracy} & \textbf{F1 Score} \\
+\textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{F1 Score} \\
 \midrule
-Titanic Dataset & Public & gpt-4o-mini             & 0.91 & 0.88 \\
-          &           & gemini-1.5-flash-latest & 0.89 & 0.85 \\
-          &           & llama3-70b-8192         & 0.90 & 0.87 \\
-          &           & gemma3                  & 0.87 & 0.83 \\
+
+\multirow{6}{*}{gpt-4o-mini} 
+    & Public       & Titanic       & 0.91 & 0.88 \\
+    &              & Cencus        & 0.89 & 0.87 \\
+    &              & Adult         & 0.93 & 0.91 \\
+    & ML Training  & Titanic        & 0.88 & 0.86 \\
+    &              & Cencus        & 0.86 & 0.83 \\
+    &              & Adult         & 0.91 & 0.89 \\
+
 \midrule
-Cencus Dataset & ML Training & gpt-4o-mini             & 0.88 & 0.86 \\
-          &           & gemini-1.5-flash-latest & 0.86 & 0.82 \\
-          &           & llama3-70b-8192         & 0.87 & 0.85 \\
-          &           & gemma3                  & 0.84 & 0.80 \\
+
+\multirow{6}{*}{gemini-1.5-flash-latest} 
+    & Public       & Titanic       & 0.89 & 0.85 \\
+    &              & Cencus        & 0.87 & 0.84 \\
+    &              & Adult         & 0.90 & 0.88 \\
+    & ML Training  & Titanic        & 0.86 & 0.82 \\
+    &              & Cencus        & 0.84 & 0.80 \\
+    &              & Adult         & 0.88 & 0.85 \\
+
 \midrule
-Cencus Dataset  & Public & gpt-4o-mini             & 0.89 & 0.87 \\
-          &           & gemini-1.5-flash-latest & 0.87 & 0.84 \\
-          &           & llama3-70b-8192         & 0.88 & 0.86 \\
-          &           & gemma3                  & 0.85 & 0.81 \\
+
+\multirow{6}{*}{llama3-70b-8192} 
+    & Public       & Titanic       & 0.90 & 0.87 \\
+    &              & Cencus        & 0.88 & 0.86 \\
+    &              & Adult         & 0.92 & 0.90 \\
+    & ML Training  & Titanic        & 0.87 & 0.85 \\
+    &              & Cencus        & 0.85 & 0.82 \\
+    &              & Adult         & 0.90 & 0.88 \\
+
 \midrule
-Cencus Dataset  & ML Training & gpt-4o-mini             & 0.86 & 0.83 \\
-          &           & gemini-1.5-flash-latest & 0.84 & 0.80 \\
-          &           & llama3-70b-8192         & 0.85 & 0.82 \\
-          &           & gemma3                  & 0.82 & 0.78 \\
-\midrule
-Adult Dataset & Public & gpt-4o-mini             & 0.93 & 0.91 \\
-          &           & gemini-1.5-flash-latest & 0.90 & 0.88 \\
-          &           & llama3-70b-8192         & 0.92 & 0.90 \\
-          &           & gemma3                  & 0.89 & 0.85 \\
-\midrule
-Adult Dataset & ML Training & gpt-4o-mini             & 0.91 & 0.89 \\
-          &           & gemini-1.5-flash-latest & 0.88 & 0.85 \\
-          &           & llama3-70b-8192         & 0.90 & 0.88 \\
-          &           & gemma3                  & 0.87 & 0.84 \\
+
+\multirow{6}{*}{gemma3} 
+    & Public       & Titanic       & 0.87 & 0.83 \\
+    &              & Cencus        & 0.85 & 0.81 \\
+    &              & Adult         & 0.89 & 0.85 \\
+    & ML Training  & Titanic        & 0.84 & 0.80 \\
+    &              & Cencus        & 0.82 & 0.78 \\
+    &              & Adult         & 0.87 & 0.84 \\
+
 \bottomrule
 \end{tabular}
 \caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
-\label{tab:llm_eval}
+\label{tab:llm_eval_grouped}
 \end{table}
+
+
 \newpage
 
 \section{Discussion}
