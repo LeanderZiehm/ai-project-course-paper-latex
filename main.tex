@@ -354,9 +354,14 @@ Our LLMANO‑2 system draws inspiration from \textit{JarviX} , a no-code platfor
     \item \textbf{Hierarchical system architecture.} We adopted a modular architecture similar to JarviX’s pipeline decomposition—starting from data ingestion, to LLM-driven interpretation, to visualization and optimization—enabling flexible extension and improved maintainability.
 \end{itemize}
 
-\paragraph{Workflow (adapted from JarviX).}
-...............
-
+\paragraph{Workflow (adapted from JarviX Figure 2).}
+Figure 2 in the JarviX paper \cite{jarvix} illustrates their overall workflow architecture, comprising dataset analysis, prompt-based context extraction, and structured decision modules in sequence. We adapt this architecture to our own anonymization pipeline, where:
+\begin{itemize}
+    \item Dataset ingestion corresponds to JarviX's Data Parser.
+    \item Our column classification and anonymization recommendation steps parallel their Prompting-based Analysis and AutoML modules.
+    \item Follow-up prompt suggestions mirror JarviX's Analysis Consultant for next-action guidance.
+\end{itemize}
+We maintain their hierarchical decomposition but tailor each module to the privacy domai
 
 \paragraph{Prompt logic.}
 Let $\mathcal{D}$ be the dataset schema and $u$ the user's initial prompt. JarviX first derives:
