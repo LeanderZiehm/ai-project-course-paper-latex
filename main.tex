@@ -504,7 +504,6 @@ The findings are that XXX.
 
 
 \section*{LLM Evaluation Against Human-Labeled Gold Standard}
-
 \begin{table}[h!]
 \centering
 \small
@@ -512,49 +511,36 @@ The findings are that XXX.
 \toprule
 \textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{F1 Score} \\
 \midrule
-
-\multirow{6}{*}{gpt-4o-mini} 
-    & Public       & Titanic       & 0.91 & 0.88 \\
-    &              & Cencus        & 0.89 & 0.87 \\
-    &              & Adult         & 0.93 & 0.91 \\
-    & ML Training  & Titanic        & 0.88 & 0.86 \\
-    &              & Cencus        & 0.86 & 0.83 \\
-    &              & Adult         & 0.91 & 0.89 \\
-
-\midrule
-
-\multirow{6}{*}{gemini-1.5-flash-latest} 
-    & Public       & Titanic       & 0.89 & 0.85 \\
-    &              & Cencus        & 0.87 & 0.84 \\
-    &              & Adult         & 0.90 & 0.88 \\
-    & ML Training  & Titanic        & 0.86 & 0.82 \\
-    &              & Cencus        & 0.84 & 0.80 \\
-    &              & Adult         & 0.88 & 0.85 \\
-
-\midrule
-
-\multirow{6}{*}{llama3-70b-8192} 
-    & Public       & Titanic       & 0.90 & 0.87 \\
-    &              & Cencus        & 0.88 & 0.86 \\
-    &              & Adult         & 0.92 & 0.90 \\
-    & ML Training  & Titanic        & 0.87 & 0.85 \\
-    &              & Cencus        & 0.85 & 0.82 \\
-    &              & Adult         & 0.90 & 0.88 \\
-
-\midrule
-
-\multirow{6}{*}{gemma3} 
-    & Public       & Titanic       & 0.87 & 0.83 \\
-    &              & Cencus        & 0.85 & 0.81 \\
-    &              & Adult         & 0.89 & 0.85 \\
-    & ML Training  & Titanic        & 0.84 & 0.80 \\
-    &              & Cencus        & 0.82 & 0.78 \\
-    &              & Adult         & 0.87 & 0.84 \\
-
+gemma3\_12b & Public & Census & 0.47 & 0.44 \\
+gemma3\_4b & Public & Census & 0.47 & 0.44 \\
+llama3.1:8b & Public & Census & 0.42 & 0.39 \\
+gemma3\_27b & Public & Census & 0.42 & 0.39 \\
+mistral\_7b & Public & Census & 0.37 & 0.34 \\
+llama3-70b-8192 & Public & Census & 0.47 & 0.44 \\
+gpt-4o-mini & Public & Census & 0.42 & 0.39 \\
+gemma3\_4b & Public & Adult & 0.47 & 0.44 \\
+llama3.1:8b & Public & Adult & 0.47 & 0.44 \\
+llama3-70b-8192 & Public & Adult & 0.33 & 0.30 \\
+gpt-4o-mini & Public & Adult & 0.47 & 0.44 \\
+gemma3\_4b & Public & Titanic & 0.33 & 0.30 \\
+llama3.1:8b & Public & Titanic & 0.17 & 0.14 \\
+llama3-70b-8192 & Public & Titanic & 0.42 & 0.39 \\
+gpt-4o-mini & Public & Titanic & 0.25 & 0.22 \\
+gemma3\_12b & Ml & Census & 0.32 & 0.29 \\
+gemma3\_4b & Ml & Census & 0.47 & 0.44 \\
+llama3.1:8b & Ml & Census & 0.53 & 0.50 \\
+llama3-70b-8192 & Ml & Census & 0.53 & 0.50 \\
+gpt-4o-mini & Ml & Census & 0.42 & 0.39 \\
+gemma3\_4b & Ml & Titanic & 0.42 & 0.39 \\
+llama3.1:8b & Ml & Titanic & 0.17 & 0.14 \\
+llama3-70b-8192 & Ml & Titanic & 0.42 & 0.39 \\
+gpt-4o-mini & Ml & Titanic & 0.33 & 0.30 \\
+gemma3\_4b & Ml & Adult & 0.47 & 0.44 \\
+llama3.1:8b & Ml & Adult & 0.53 & 0.50 \\
+llama3-70b-8192 & Ml & Adult & 0.40 & 0.37 \\
+gpt-4o-mini & Ml & Adult & 0.60 & 0.57 \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
-\label{tab:llm_eval_grouped}
 \end{table}
 
 
