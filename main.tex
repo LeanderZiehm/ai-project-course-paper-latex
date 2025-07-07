@@ -554,32 +554,23 @@ mistral\_7b & Public & Census & 0.37 & 0.52 \\
 \end{table}
 \newpage
 
-xxx
-\begin{figure}[h]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[width=1\linewidth]{images/plot_eval2.png}
-    \caption{col}
+    \includegraphics[width=\linewidth]{images/plot_eval2.png}
+    \caption{Column classifications produced by human annotators and language models.}
     \label{fig:col}
 \end{figure}
 
-XXX
-
-\begin{figure}[h]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[width=1\linewidth]{images/plot_eval.png}
-    \caption{Anon}
+    \includegraphics[width=\linewidth]{images/plot_eval.png}
+    \caption{Anonymisation methods selected by human annotators and language models.}
     \label{fig:anonymization}
 \end{figure}
 
-We found that LLMS sometimes wouldn't give a anon method sepcially high on gpt 4 o mini
 
-The evaluation confirms that model size and training quality affect classification accuracy, but even the strongest model falls short of perfect agreement with human annotators.  
-Errors are often tied to ambiguous column names or highly unbalanced value distributions.  
-The results indicate that further gains are likely from improvements in prompt context and from expanding the codebook with clearer definitions, rather than from model scale alone.
+Across all datasets, every model in Table~\ref{tab:llm_eval_grouped} performs better than the uniform–random baseline of 0.25 accuracy that would arise from guessing among four classes.  Figures~\ref{fig:col} and~\ref{fig:anonymization} show the same trend graphically.  We also note that \texttt{gpt-4o-mini} occasionally returned no anonymisation method for a column; each omission was treated as an error, which lowers its reported scores.
 
-Future work should also compare the anonymisation suggestions against established baselines to measure their practical impact on privacy risk and data utility.
-
-\newpage
 
 \section{Discussion}
 \subsection{Limitations}
