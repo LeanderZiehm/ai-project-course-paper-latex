@@ -557,10 +557,14 @@ No single model dominated across all tasks, which suggests that prompt and conte
  &  & Census & 0.37 & 0.32 \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
+\caption{Accuracy scores of each model across datasets and purposes, benchmarked against our hand label annotations.}
 \label{tab:llm_eval_grouped}
 \end{table}
 
+
+DISCLAMER because the models returned an empty string we those values where rated as false therefore the lower accuracy for Anonymisation methods
+
+Across all datasets, every model in Table~\ref{tab:llm_eval_grouped} performs better than the uniform–random baseline of 0.25 accuracy that would arise from guessing among four classes.  Figures~\ref{fig:col} and~\ref{fig:anonymization} show the same trend graphically.  We also note that \texttt{gpt-4o-mini} occasionally returned no anonymisation method for a column; each omission was treated as an error, which lowers its reported scores.
 
 
 
@@ -579,10 +583,6 @@ No single model dominated across all tasks, which suggests that prompt and conte
     \caption{Anonymisation methods selected by human annotators and language models.}
     \label{fig:anonymization}
 \end{figure}
-
-DISCLAIMER: Because the models returned an empty string, those values were rated as false, therefore resulting in a lower accuracy for Anonymisation methods.
-
-Across all datasets, every model in Table~\ref{tab:llm_eval_grouped} performs better than the uniform–random baseline of 0.25 accuracy that would arise from guessing among four classes.  Figures~\ref{fig:col} and~\ref{fig:anonymization} show the same trend graphically.  We also note that \texttt{gpt-4o-mini} occasionally returned no anonymisation method for a column; each omission was treated as an error, which lowers its reported scores.
 
 
 In our evaluation, we first encountered the issue that some free LLM providers had pretty limiting rate limits. Due to time constraints, we had to skip testing Gemini. We mostly used Grok, OpenAI, and our own self-hosted O-LLaMA, which included a few local models. However, we could not test all models on everything, again due to the time limitations.
