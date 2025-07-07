@@ -6,6 +6,8 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{subcaption}
+\usepackage{float}
+
 
 
 \title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
@@ -564,24 +566,21 @@ DISCLAMER because the models returned an empty string we those values where rate
 Across all datasets, every model in Table~\ref{tab:llm_eval_grouped} performs better than the uniform–random baseline of 0.25 accuracy that would arise from guessing among four classes.  Figures~\ref{fig:col} and~\ref{fig:anonymization} show the same trend graphically.  We also note that \texttt{gpt-4o-mini} occasionally returned no anonymisation method for a column; each omission was treated as an error, which lowers its reported scores.
 
 
-
-\newpage
-
-\begin{figure}[!htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/plot_eval2.png}
     \caption{Column classifications produced by human annotators and language models.}
     \label{fig:col}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/plot_eval.png}
     \caption{Anonymisation methods selected by human annotators and language models.}
     \label{fig:anonymization}
 \end{figure}
 
-\newpage
+
 
 In our evaluation, we first encountered the issue that some free LLM providers had pretty limiting rate limits. Due to time constraints, we had to skip testing Gemini. We mostly used Grok, OpenAI, and our own self-hosted Ollama, which included a few local models. However, we could not test all models on everything, again due to the time limitations.
 
