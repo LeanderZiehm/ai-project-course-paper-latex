@@ -514,49 +514,53 @@ No single model dominated across all tasks, which suggests that prompt and conte
 \small
 \begin{tabular}{lllccl}
 \toprule
-\textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{F1 Score} \\
+\textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy Classification} & \textbf{Accuracy Anonymization} \\
 \midrule
-\multirow{2}{*}{gemma3\_12b} & Ml & Census & 0.32 & 0.46 \\
- & Public & Census & 0.47 & 0.62 \\
+\multirow{3}{*}{gemma3\_12b} & Ml & Census & 0.32 & 0.26 \\
+ & \multirow{2}{*}{Public} & Adult & 0.40 & 0.27 \\
+ &  & Census & 0.47 & 0.37 \\
 \midrule
-\multirow{2}{*}{gemma3\_27b} & Ml & Census & 0.53 & 0.67 \\
- & Public & Census & 0.42 & 0.57 \\
+\multirow{3}{*}{gemma3\_27b} & Ml & Census & 0.53 & 0.58 \\
+ & \multirow{2}{*}{Public} & Adult & 0.27 & 0.20 \\
+ &  & Census & 0.42 & 0.42 \\
 \midrule
-\multirow{6}{*}{gemma3\_4b} & \multirow{3}{*}{Ml} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.42 & 0.59 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.33 & 0.50 \\
+\multirow{6}{*}{gemma3\_4b} & \multirow{3}{*}{Ml} & Adult & 0.47 & 0.27 \\
+ &  & Census & 0.47 & 0.37 \\
+ &  & Titanic & 0.42 & 0.08 \\
+ & \multirow{3}{*}{Public} & Adult & 0.47 & 0.33 \\
+ &  & Census & 0.47 & 0.47 \\
+ &  & Titanic & 0.33 & 0.33 \\
 \midrule
-\multirow{6}{*}{gpt-4o-mini} & \multirow{3}{*}{Ml} & Adult & 0.60 & 0.75 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.33 & 0.50 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.25 & 0.40 \\
+\multirow{6}{*}{gpt-4o-mini} & \multirow{3}{*}{Ml} & Adult & 0.60 & 0.47 \\
+ &  & Census & 0.42 & 0.42 \\
+ &  & Titanic & 0.33 & 0.17 \\
+ & \multirow{3}{*}{Public} & Adult & 0.47 & 0.40 \\
+ &  & Census & 0.42 & 0.42 \\
+ &  & Titanic & 0.25 & 0.17 \\
 \midrule
-\multirow{6}{*}{llama3-70b-8192} & \multirow{3}{*}{Ml} & Adult & 0.40 & 0.57 \\
- &  & Census & 0.53 & 0.67 \\
- &  & Titanic & 0.42 & 0.59 \\
- & \multirow{3}{*}{Public} & Adult & 0.33 & 0.50 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.42 & 0.59 \\
+\multirow{6}{*}{llama3-70b-8192} & \multirow{3}{*}{Ml} & Adult & 0.40 & 0.33 \\
+ &  & Census & 0.53 & 0.47 \\
+ &  & Titanic & 0.42 & 0.08 \\
+ & \multirow{3}{*}{Public} & Adult & 0.33 & 0.27 \\
+ &  & Census & 0.47 & 0.47 \\
+ &  & Titanic & 0.42 & 0.42 \\
 \midrule
-\multirow{6}{*}{llama3.1:8b} & \multirow{3}{*}{Ml} & Adult & 0.53 & 0.70 \\
- &  & Census & 0.53 & 0.67 \\
- &  & Titanic & 0.17 & 0.29 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.17 & 0.29 \\
+\multirow{6}{*}{llama3.1:8b} & \multirow{3}{*}{Ml} & Adult & 0.53 & 0.40 \\
+ &  & Census & 0.53 & 0.42 \\
+ &  & Titanic & 0.17 & 0.08 \\
+ & \multirow{3}{*}{Public} & Adult & 0.47 & 0.40 \\
+ &  & Census & 0.42 & 0.32 \\
+ &  & Titanic & 0.17 & 0.08 \\
 \midrule
-\multirow{2}{*}{mistral\_7b} & Ml & Census & 0.42 & 0.57 \\
- & Public & Census & 0.37 & 0.52 \\
+\multirow{3}{*}{mistral\_7b} & Ml & Census & 0.42 & 0.42 \\
+ & \multirow{2}{*}{Public} & Adult & 0.27 & 0.20 \\
+ &  & Census & 0.37 & 0.32 \\
 \bottomrule
 \end{tabular}
 \caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
 \label{tab:llm_eval_grouped}
 \end{table}
+
 
 
 
