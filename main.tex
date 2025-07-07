@@ -580,6 +580,20 @@ No single model dominated across all tasks, which suggests that prompt and conte
 Across all datasets, every model in Table~\ref{tab:llm_eval_grouped} performs better than the uniform–random baseline of 0.25 accuracy that would arise from guessing among four classes.  Figures~\ref{fig:col} and~\ref{fig:anonymization} show the same trend graphically.  We also note that \texttt{gpt-4o-mini} occasionally returned no anonymisation method for a column; each omission was treated as an error, which lowers its reported scores.
 
 
+In our evaluation, we first encountered the issue that some free LM providers had pretty limiting rate limits. Due to time constraints, we had to skip testing Gemini. We mostly used Grok, OpenAI, and our own self-hosted O-LLaMA, which included a few local models. However, we couldn’t test all models on everything, again due to the time limitations.
+
+One discovery we made was that, for the anonymization method selection task, many models returned an empty result. This was either due to an error in our pipeline or, more likely, a behavioral issue where the models simply didn’t return the expected format. This disrupted our pipeline, and our error handling caught it and returned an empty result. So, this could reflect both a weakness in the LMs—failing to return the correct format—and some limitations in our pipeline, which may not have been robust enough. It could also be due to our prompts not being specific enough.
+
+Interestingly, OpenAI—expected to be the most responsive to prompt formatting—had the most empty results. This might suggest a prompt issue, or perhaps some other deeper behavior worth investigating.
+
+Another notable point is that differential privacy was never selected by the LMs. This could be due to the way we prompted, but also, from an annotator’s perspective, it was quite difficult to know when to apply it. We only selected it in the case of machine learning models when the context involved a number and it seemed appropriate. Even then, it was a difficult decision. So, it's not surprising that the LMs didn’t pick it, though we had hoped that at least for ML-related contexts they would. This may be a prompting issue as well, or perhaps differential privacy is too complex as an anonymization method, and not well represented in the training data of the LMs.
+
+Another finding—from Figure 7—is that no model ever classified anything as a sensitive attribute. That’s something we may want to address in future versions of the pipeline. Perhaps refining the prompts, or switching to a two-step process could help: first classify whether something is a direct identifier, indirect (quasi) identifier, or non-identifier, and then, for quasi-identifiers, return a “sensitive: true/false” flag or sensitivity score to make this dimension more prominent.
+
+Among the anonymization techniques, generalization was selected the most by both humans and LMs. For suppression, the tendencies were similar, although we noticed that LLaMA 70B used it less often, as did Gemini 27B. So, it appears that the more capable models tend to use suppression less, which is an interesting observation.
+
+In Figure 7, LLaMA 70B also seemed to classify more entities as direct identifiers. And from Table 1, we can see that the F1 score of the o4-mini model is the highest—making it the best model overall—even though its accuracy isn’t as high.
+
 \section{Discussion}
 \subsection{Limitations}
 \label{sec:limitations}
