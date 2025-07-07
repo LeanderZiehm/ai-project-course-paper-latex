@@ -553,7 +553,16 @@ mistral\_7b & Public & Census & 0.37 & 0.52 \\
 \label{tab:llm_eval_grouped}
 \end{table}
 
-\subsection{Discussion}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{images/plot_eval.png}
+    \caption{Anon}
+    \label{fig:anonymization-example}
+\end{figure}
+
+We found that LLMS sometimes wouldn't give a anon method sepcially high on gpt 4 o mini
 
 The evaluation confirms that model size and training quality affect classification accuracy, but even the strongest model falls short of perfect agreement with human annotators.  
 Errors are often tied to ambiguous column names or highly unbalanced value distributions.  
