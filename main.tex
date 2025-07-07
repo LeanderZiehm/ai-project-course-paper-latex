@@ -5,6 +5,7 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{subcaption}
 
 
 \title{LLM Anonymization Techniques Recommender for Datasets (LLMANO-2)}
@@ -230,73 +231,132 @@ then even with $l$-diversity, an attacker learns an individual's disease with ce
 \end{enumerate}
 
 
-
 \section{Architecture}
 \label{sec:architecture}
 
 \subsection{Design rationale}
 
-LLMANO is meant to operate as an on-premise, language-centric assistant that guides non-experts through the anonymisation of tabular datasets.  Consequently the system must (i) accept queries in natural language, (ii) ingest a spreadsheet-like file, (iii) perform an automatic privacy screening before any user action, and (iv) expose a set of callable tools so the language model can compute metrics such as $k$-anonymity or $l$-diversity on demand.  These requirements favour a modular architecture: new capabilities should be added with minimal friction and without touching unrelated modules.  Expansion, for example adding a fresh privacy tool, must not require edits to the integration of the LLMs in the pipeline.  Open-source frameworks are preferred throughout; while the large language model itself may be commercial, the current build already includes an Ollama adapter that can point to a fully self-hosted model, yielding a pipeline that is open from end to end.
+LLMANO runs on-premise and helps non-experts anonymise tabular data through natural-language interaction.  
+The system must therefore (i) accept free-text questions, (ii) load a CSV file, (iii) perform an automatic privacy check before any user action, and (iv) offer callable tools so the language model can compute metrics such as $k$-anonymity or $l$-diversity when needed.  
+These requirements favour a modular layout: new features should be added without modifying unrelated parts of the code.  
+All major support libraries are open-source; the only closed component may be the language model itself.  
+An Ollama adapter is provided so that users can connect to a local, fully open model if required.
 
-The platform is model-agnostic.  A thin abstract class, \texttt{BaseLLM}, exposes only the primitive operations needed by the rest of the application—token streaming, temperature control, and a low-level function call interface.  Concrete subclasses, here called adapters, encapsulate every provider-specific nuance, from authentication to tool-calling syntax.  Whenever a new model is required, the developer implements a single adapter; the surrounding code remains unchanged, and the user can switch models at run time.  Higher-level helpers such as \texttt{fuzzy\_match} are implemented \emph{outside} \texttt{BaseLLM} and rely exclusively on those primitive methods, so they work identically with every adapter.
+The platform is model-agnostic.  
+An abstract class \texttt{BaseLLM} exposes only the low-level operations needed by the rest of the application, such as text generation and tool invocation.  
+Concrete subclasses, called adapters, hide provider-specific details like authentication and function-calling syntax.  
+When a new model is added, only a new adapter is required.  
+Higher-level utilities such as \texttt{fuzzy\_match} are implemented outside \texttt{BaseLLM} and rely solely on its primitives, so they work with every adapter.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\linewidth]{images/class_diagram.pdf}
-    \caption{Class diagram of \texttt{BaseLLM}, adapters, engine and orchestrator.}
+    \includegraphics[width=0.8\linewidth]{images/class_diagram.pdf}
+    \caption{Class diagram of \texttt{BaseLLM}, its adapters, and the orchestration layer.}
     \label{fig:class-diagram}
 \end{figure}
 
 \subsection{Hardware notes}
 
-Because the platform delegates inference to whichever model the user selects, resource consumption scales with parameter count.  All experiments so far have been conducted on Linux.  A local 8-billion-parameter Llama runs successfully on CPU, though latency is noticeable; GPU acceleration or a smaller checkpoint is advisable for interactive use.  Section~\ref{evaluation} reports measured runtimes.
+Resource use scales with the size of the chosen model.  
+All tests have been run on Linux.  
+A local 8-billion-parameter Llama model is usable on a modern desktop CPU, but responses are slow; GPU support or a smaller checkpoint is recommended.  
+Measured runtimes appear in Section~\ref{evaluation}.
 
 \subsection{LLM-mediated decisions}
 
-Balancing rich prompts against atomic decisions proved delicate.  Prior work shows that large language models perform well when deductively coding text against a fixed codebook~\cite{llm_content_analysis}.  We therefore implemented a helper, \texttt{fuzzy\_match}, which accepts (i) a natural-language context, (ii) a dictionary of codes, and (iii) the candidate attribute together with sample values.  The model must return the best-matching code.  This mechanism tags each column as a direct identifier (\texttt{DI}), quasi-identifier (\texttt{QI}), sensitive attribute (\texttt{SA}) or non-identifier (\texttt{NI}) and later chooses an appropriate anonymisation technique.  As observed by Chew \textit{et al.}~\cite{llm_content_analysis}, refining the code definitions with the same LLM improves downstream accuracy, a pattern repeated here.
+Most privacy actions map an attribute to a label: direct identifier (DI), quasi-identifier (QI), sensitive attribute (SA) or non-identifier (NI).  
+The helper \texttt{fuzzy\_match} performs this task by combining a natural-language context, a codebook and sample values.  
+Structured output is enforced with LangChain and Pydantic, which yields reliable JSON without heavy prompt engineering.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lp{0.75\linewidth}}
-        \hline
-        \textbf{Code} & \textbf{Definition}\\
-        \hline
-        DI & Direct identifiers that, by themselves, uniquely identify an individual.\\
-        QI & Quasi-identifiers that enable re-identification only in combination with other data.\\
-        SA & Sensitive attributes whose disclosure is harmful even without explicit identity.\\
-        NI & Attributes that cannot reasonably re-identify an individual, even in combination.\\
-        \hline
-    \end{tabular}
-    \caption{Example codebook (simplified) used by \texttt{fuzzy\_match}.}
-    \label{tab:fuzzy-codebook}
-\end{table}
+\subsection{Workflow}
 
-Several approaches were tested to ensure the model returned well-formed data.  Embedding the target schema directly in the prompt produced unstable results; adding iterative validation loops improved reliability but quickly cluttered the adapters.  The final solution adopts LangChain’s structured-output feature: replies are validated against a \texttt{Pydantic} model such as
-\begin{verbatim}
-class FuzzyMatchResponse(BaseModel):
-    code: str
-    rationale: str | None
-\end{verbatim}
-This approach yields consistent parsing while keeping the adapters concise and remains fully open-source.
+The session starts with an intake form.  
+The system then profiles the file, shows a brief overview, classifies each column and suggests an anonymisation method.  
+After this initial step, the user interacts through a chat window.  
+If the request references a supported metric, the adapter calls the matching Python routine and includes the result in the reply.  
+After every turn the model proposes three follow-up questions based on the entire conversation.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.85\linewidth]{images/workflow_diagram.pdf}
-    \caption{End-to-end workflow of LLMANO.}
+    \caption{Main workflow of LLMANO.}
     \label{fig:workflow-diagram}
 \end{figure}
 
-\subsection{Workflow}
-
-The anonymization session begins with an intake form in which the user states the analysis goal, their existing knowledge of the dataset and any columns of particular concern.  The platform then inspects the file, extracts five representative rows plus summary statistics and forwards both dataset and form content to the model.  The first reply is a brief overview of the data; the second comprises one classification call per column, followed by anonymisation recommendations derived from an internal knowledge base.  Results are rendered as a colour-coded table—red for \texttt{DI}, yellow for \texttt{QI} and blue for \texttt{SA}—and accompanied by a concise markdown report.
-
-Once the initial analysis is complete the system enters a conversational loop.  Each user query passes through the active adapter.  If the request references an implemented metric (for example \(k\)-anonymity), the adapter calls the matching Python routine and embeds the result in the reply.  After every turn the model proposes three plausible follow-up questions, using the full dialogue as context.
-
-The output presented to the user consists of the chat transcript, the coloured table head and a recommendation pane listing a suggested anonymisation method for every non-\texttt{NI} column.
+The interface displays the chat, a colour-coded table head, and a panel that lists one anonymisation method for each non-NI column.
 
 \subsection{Summary}
 
-The architecture satisfies the original design goals: it runs on-premise, ingests tabular data, performs an automatic privacy audit and answers natural-language questions.  Modularity is maintained through an adapter layer that isolates provider details, while structured outputs guarantee that the application receives well-formed data.  The resulting system can be extended, audited and deployed without risking exposure of raw, non-anonymised records.
+The architecture meets the design goals: it runs locally, screens the data automatically and answers natural-language queries.  
+Modularity is achieved through the adapter layer, and structured outputs ensure that the application receives well-formed data.  
+The system can be extended without exposing raw records.
+
+% ------------------------------------------------------------------
+\section{User Interface}
+\label{sec:ui}
+
+The interface guides the user through three screens: upload, context, and analysis.  
+The layout is simple so that colour is reserved for risk levels.
+
+\subsection{Upload screen}
+
+The first page asks the user to drag and drop a CSV file and to select a language model (Figure~\ref{fig:ui-upload}).  
+No data are sent to the back-end until the file selection is confirmed.
+
+\begin{figure}[h]
+    \centering
+    %
+    \begin{minipage}[c]{0.48\linewidth}
+        \centering
+        \includegraphics[height=7cm]{images/upload_ui.jpg}
+        \subcaption{Upload screen with file selector and model drop-down.}
+        \label{fig:ui-upload}
+    \end{minipage}\hfill
+    %
+    \begin{minipage}[c]{0.48\linewidth}
+        \centering
+        \includegraphics[height=9cm]{images/form_ui.jpg}
+        \subcaption{Context form for analysis purpose and attribute selection.}
+        \label{fig:ui-context}
+    \end{minipage}
+    %
+    \caption{Initial interaction screens.  Both images are shown at the same height for visual consistency.}
+    \label{fig:ui-initial-screens}
+\end{figure}
+
+
+\subsection{Context form}
+
+After upload the system presents a short form (Figure~\ref{fig:ui-upload}) where the user can specify the purpose of the analysis, domain constraints and attributes of interest.  
+All fields are optional; the model uses any information provided to improve the initial analysis.
+
+\subsection{Analysis view}
+
+The main view has two panels side by side (Figure~\ref{fig:ui-chat-results}).  
+The left panel contains the chat history; the right panel shows the table head and the recommendations.  
+Columns are shaded red (DI), yellow (QI) or blue (SA).  
+Below the table, a list summarises one anonymisation method per column.  
+A legend explains the colour scheme.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/chat_ui.jpg}
+    \caption{Chat and results panels after the initial analysis.}
+    \label{fig:ui-chat-results}
+\end{figure}
+
+A compact version of the results panel can be displayed on its own (Figure~\ref{fig:ui-table-only}).  
+This view is intended for screenshots and future export to a report.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/results_ui.jpg}
+    \caption{Standalone results panel with colour-coded table and suggestions.}
+    \label{fig:ui-table-only}
+\end{figure}
+
+Interaction beyond this point is conducted entirely through the chat.  
+No additional controls are required, which keeps the interface straightforward for users with varying technical backgrounds.
 
 
 \section{Related Work}
