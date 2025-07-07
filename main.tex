@@ -95,7 +95,7 @@ Several anonymization techniques have been developed to reduce the risk of re-id
 These techniques are often used in combination and must be tailored to the specific context of the dataset. The choice of technique involves trade-offs between privacy protection and data utility, and selecting the appropriate method requires a clear understanding of the risks, the data's structure, and its intended use.
 
 
-We also discuss user-driven anonymization processes and the limitations of manual or rule-based methods in ensuring privacy. In the remainder of this section, we outline the mathematical foundations underlying key privacy-preserving techniques in data publishing, including $k$-anonymity, $l$-diversity, and generalization strategies.
+We also discuss user-driven anonymization processes and the limitations of manual or rule-based methods in ensuring privacy. In the remainder of this section, we outline the mathematical foundations underlying key privacy, preserving techniques in data publishing, including $k$-anonymity, $l$-diversity, and generalization strategies.
 
 \subsection{$k$-Anonymity}
 
@@ -279,18 +279,18 @@ class FuzzyMatchResponse(BaseModel):
 \end{verbatim}
 This approach yields consistent parsing while keeping the adapters concise and remains fully open-source.
 
-\subsection{Workflow}
-
-The anonymization session begins with an intake form in which the user states the analysis goal, their existing knowledge of the dataset and any columns of particular concern.  The platform then inspects the file, extracts five representative rows plus summary statistics and forwards both dataset and form content to the model.  The first reply is a brief overview of the data; the second comprises one classification call per column, followed by anonymisation recommendations derived from an internal knowledge base.  Results are rendered as a colour-coded table—red for \texttt{DI}, yellow for \texttt{QI} and blue for \texttt{SA}—and accompanied by a concise markdown report.
-
-Once the initial analysis is complete the system enters a conversational loop.  Each user query passes through the active adapter.  If the request references an implemented metric (for example \(k\)-anonymity), the adapter calls the matching Python routine and embeds the result in the reply.  After every turn the model proposes three plausible follow-up questions, using the full dialogue as context.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.85\linewidth]{images/workflow_diagram.pdf}
     \caption{End-to-end workflow of LLMANO.}
     \label{fig:workflow-diagram}
 \end{figure}
+
+\subsection{Workflow}
+
+The anonymization session begins with an intake form in which the user states the analysis goal, their existing knowledge of the dataset and any columns of particular concern.  The platform then inspects the file, extracts five representative rows plus summary statistics and forwards both dataset and form content to the model.  The first reply is a brief overview of the data; the second comprises one classification call per column, followed by anonymisation recommendations derived from an internal knowledge base.  Results are rendered as a colour-coded table—red for \texttt{DI}, yellow for \texttt{QI} and blue for \texttt{SA}—and accompanied by a concise markdown report.
+
+Once the initial analysis is complete the system enters a conversational loop.  Each user query passes through the active adapter.  If the request references an implemented metric (for example \(k\)-anonymity), the adapter calls the matching Python routine and embeds the result in the reply.  After every turn the model proposes three plausible follow-up questions, using the full dialogue as context.
 
 The output presented to the user consists of the chat transcript, the coloured table head and a recommendation pane listing a suggested anonymisation method for every non-\texttt{NI} column.
 
@@ -528,6 +528,15 @@ Currently, LLMANO-2 depends heavily on carefully crafted prompts to guide its an
 In a RAG-based setup, the choice of which anonymization method to use would be informed by embedded representations of past successful cases, legal requirements, and established best practices, all stored in a well curated knowledge base. This approach is especially useful when working across different domains like healthcare, finance, or education, where privacy expectations can vary widely. Tools like FAISS \cite{faiss2023} or Chroma can serve as the vector search engine behind this, enabling the system to retrieve relevant context without being limited by token constraints. Combined with LLM reasoning, this setup can improve both accuracy and reliability by grounding the model’s output in meaningful, domain-specific information \cite{llm_content_analysis}.
 
 Adopting a RAG-based architecture would also make the system more modular. Domain-specific privacy guidelines could be stored in separate knowledge bases, allowing the model to retrieve only what’s relevant for each context, without needing to retrain or manually tweak prompt templates. This is particularly helpful when dealing with evolving regulations, like updates to GDPR interpretations, since changes can be made directly in the documents rather than in the application code.
+
+\paragraph{Downloadable, model-generated reports.}
+At present the system surfaces its findings only inside the chat window; users cannot export a consolidated document.  
+A practical extension is a “Generate report” action that compiles the conversation’s key artefacts (dataset summary, column classifications, risk metrics and recommended transformations) into a standalone PDF or HTML file.  
+The report would follow a fixed template populated by the LLM and post-processed with \texttt{pandoc} or \texttt{LaTeX}, guaranteeing a stable layout while allowing the model to fill narrative sections such as methodological notes or next-step check-lists.  
+A download link should appear in the interface once generation is complete.  
+Longer term, the report could be made editable: users would request revisions in natural language, the LLM would patch the underlying markdown, and a new version would be rendered on demand.  
+This feature closes the loop between interactive guidance and formal documentation, giving practitioners a tangible artefact for audit trails, compliance submissions or further manual refinement.
+
 
 \paragraph{Summary.}
 Agentic orchestration and RAG complement each other well and offer solutions to two of LLMANO-2’s current limitations, its reliance on linear prompt flows and the brittleness of static prompt design. By combining tool-based reasoning with modular knowledge retrieval, the system could become more robust, easier to interpret, and better suited for scaling. These improvements would also support more interactive, human-in-the-loop workflows, where users can review, adjust, or fine-tune anonymization steps based on clear intermediate outputs.
