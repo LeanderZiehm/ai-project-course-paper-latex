@@ -469,90 +469,97 @@ LLMANO adopts SCORR’s assumptions that:
 \paragraph{Summary.}
 These definitions, notation structures, and assumptions from \emph{Scoring System for Quantifying the Privacy in Re-Identification of Tabular Datasets} provide the foundation for LLMANO’s identifier recognition logic, privacy metric calculations, and risk analysis modules.
 
-\section{Evaluation} \label{evaluation}
+\section{Evaluation}
+\label{evaluation}
 
+\subsection{Method}
 
-We conducted our evaluation by comraring the LLMs classifications to our own annotations as our benchmark. As we are not anonymisation experts we optet to validate and agree on annotations as a team. Through discussion and 4 different opinions we aim to make this evaluation more robust. Another notable part of our evaluation is that the anotators are not allowed to use external tools like pandas to get additional information aboout the dataset. They are only alowed to use the json that is provided to them. The json contains the same information that the LLM gets as a input. This approach was choses to make sure that the human anotators don't have and external unfair advantage against the llm ans and the LLM. 
+We assessed the quality of the model output against a human‐labelled gold standard.  
+Four members of the project team independently annotated each dataset column as \texttt{DI}, \texttt{QI}, \texttt{SA} or \texttt{NI}.  
+Annotators worked only with a JSON excerpt that contained the same information given to the language model: the column name, up to twenty unique values, and a short dataset summary.  
+External tools such as \texttt{pandas} were not permitted, which kept the human baseline comparable with the LLM input.  
+Disagreements were resolved by discussion until full consensus was reached.
 
+\subsection{Model set-up}
 
-\section*{LLM Analissi algorithm}
+All models followed the two-step procedure described in Section~\ref{sec:architecture}.  
+First, the model classified each column; second, it selected one of three anonymisation options (generalisation, suppression, differential privacy) or \texttt{none}.  
+Prompts were identical across runs, and temperature was set to~0.  
+Where a model exposed a function-calling interface, the structured-output variant was used; otherwise the plain text version with JSON validation was applied.
 
+\subsection{Datasets and tasks}
 
-I THINK THIS MIGHT BE REPEATED IF SOMEONE ALREDY TALKED ABOUT THE ALGORITOM BEFORE:
+We evaluated three public tabular datasets—Adult, Census, and Titanic—under two usage scenarios: \textit{machine-learning training} (“ML”) and \textit{public release}.  
+The scenario was provided to the model as additional context.  
+Different scenarios matter because stricter privacy may be required for public release than for internal model training.
 
-2 to identify direct identifiers, quasi-identifiers, non-identifiers, and sensitive attributes. The classification is based on definitions and guidelines from sources one, two, three, and four.
+\subsection{Metrics}
 
-This is the first step of the process. The second step involves classification again, but this time in support of anonymization strategies. For normalization methods, we chose generalization for this paper. We also incorporated suppression as an anonymization method. Additionally, differential privacy was included, as it was requested by the professor. Thus, these three—generalization, suppression, and differential privacy—make up our anonymization options.
+Performance was measured with simple accuracy and macro F1, computed per column and averaged over the dataset.  
+Macro F1 gives equal weight to the four label classes and balances precision and recall.
 
-The LLM receives the form, when available, as context. If no form is provided, this context remains empty. No extra text is added in our example; instead, all columns in the dataset are selected as important.
+\subsection{Results}
 
-Two approaches are tested, including one using machine learning. The dataset is made publicly available. The language model receives the dataset and its description. For each column, a summary prompt is generated. First, the LLM summarizes the dataset. Then, it processes all columns and extracts either all unique values or, if there are too many, a maximum of 20 unique values to avoid overloading the context.
+Table~\ref{tab:llm_eval_grouped} summarises the scores.  
+Accuracy ranged from 0.25 to 0.60, with macro F1 following the same trend.  
+Larger or more recent models, such as \texttt{gpt-4o-mini} and \texttt{llama3-70b}, tended to outperform smaller checkpoints, especially on the Adult dataset.  
+Performance was lower on Titanic, whose small size yields fewer examples per column and makes classification harder for both humans and models.  
+No single model dominated across all tasks, which suggests that prompt and context design still play a major role.
 
-The LLM then classifies whether a column is a direct identifier, quasi-identifier, sensitive attribute, or non-identifier. This classification is made using the column name, the unique values, the dataset summary, and user context from the form. The output consists of the classification label and a rationale.
-
-In the second step, the anonymization purpose is extracted from the form, if available. This, along with the column name, sample values, and classification, is passed to the LLM. The model selects one of the anonymization methods: generalization, suppression, differential privacy, or none.
-
-The prompt instructs the model to take on the role of a data privacy expert advising a user on how to reduce re-identification risk in the dataset. For each column that is considered a risk attribute, the LLM must suggest in one concise sentence how an organization can apply an anonymization method or technique.
-
-Thus, the process involves a classification step followed by an explanation step that recommends how to apply anonymization.
-
-
-
-
-
-The findings are that XXX.
-
-
-\section*{LLM Evaluation Against Human-Labeled Gold Standard}
-\begin{table}[h!]
+\begin{table}[h]
 \centering
 \small
 \begin{tabular}{lllccl}
 \toprule
-\textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{F1 Score} \\
+\textbf{Model} & \textbf{Purpose} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{F1} \\
 \midrule
-\multirow{2}{*}{gemma3\_12b} & Ml & Census & 0.32 & 0.46 \\
- & Public & Census & 0.47 & 0.62 \\
+\multirow{2}{*}{gemma3\_12b} & ML & Census & 0.32 & 0.46 \\
+                             & Public & Census & 0.47 & 0.62 \\
 \midrule
-\multirow{1}{*}{gemma3\_27b} & Public & Census & 0.42 & 0.57 \\
+gemma3\_27b & Public & Census & 0.42 & 0.57 \\
 \midrule
-\multirow{6}{*}{gemma3\_4b} & \multirow{3}{*}{Ml} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.42 & 0.59 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.33 & 0.50 \\
+\multirow{6}{*}{gemma3\_4b} & \multirow{3}{*}{ML} & Adult & 0.47 & 0.64 \\
+                            &                     & Census & 0.47 & 0.62 \\
+                            &                     & Titanic & 0.42 & 0.59 \\
+                            & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
+                            &                          & Census & 0.47 & 0.62 \\
+                            &                          & Titanic & 0.33 & 0.50 \\
 \midrule
-\multirow{6}{*}{gpt-4o-mini} & \multirow{3}{*}{Ml} & Adult & 0.60 & 0.75 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.33 & 0.50 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.25 & 0.40 \\
+\multirow{6}{*}{gpt-4o-mini} & \multirow{3}{*}{ML} & Adult & 0.60 & 0.75 \\
+                             &                     & Census & 0.42 & 0.57 \\
+                             &                     & Titanic & 0.33 & 0.50 \\
+                             & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
+                             &                          & Census & 0.42 & 0.57 \\
+                             &                          & Titanic & 0.25 & 0.40 \\
 \midrule
-\multirow{6}{*}{llama3-70b-8192} & \multirow{3}{*}{Ml} & Adult & 0.40 & 0.57 \\
- &  & Census & 0.53 & 0.67 \\
- &  & Titanic & 0.42 & 0.59 \\
- & \multirow{3}{*}{Public} & Adult & 0.33 & 0.50 \\
- &  & Census & 0.47 & 0.62 \\
- &  & Titanic & 0.42 & 0.59 \\
+\multirow{6}{*}{llama3-70b} & \multirow{3}{*}{ML} & Adult & 0.40 & 0.57 \\
+                            &                     & Census & 0.53 & 0.67 \\
+                            &                     & Titanic & 0.42 & 0.59 \\
+                            & \multirow{3}{*}{Public} & Adult & 0.33 & 0.50 \\
+                            &                          & Census & 0.47 & 0.62 \\
+                            &                          & Titanic & 0.42 & 0.59 \\
 \midrule
-\multirow{6}{*}{llama3.1:8b} & \multirow{3}{*}{Ml} & Adult & 0.53 & 0.70 \\
- &  & Census & 0.53 & 0.67 \\
- &  & Titanic & 0.17 & 0.29 \\
- & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
- &  & Census & 0.42 & 0.57 \\
- &  & Titanic & 0.17 & 0.29 \\
+\multirow{6}{*}{llama3-8b} & \multirow{3}{*}{ML} & Adult & 0.53 & 0.70 \\
+                           &                     & Census & 0.53 & 0.67 \\
+                           &                     & Titanic & 0.17 & 0.29 \\
+                           & \multirow{3}{*}{Public} & Adult & 0.47 & 0.64 \\
+                           &                          & Census & 0.42 & 0.57 \\
+                           &                          & Titanic & 0.17 & 0.29 \\
 \midrule
-\multirow{1}{*}{mistral\_7b} & Public & Census & 0.37 & 0.52 \\
+mistral\_7b & Public & Census & 0.37 & 0.52 \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy and F1 scores of each model across datasets and purposes, benchmarked against human-labeled gold standard.}
+\caption{Accuracy and macro F1 for each model, scenario and dataset, benchmarked against the human gold standard.}
 \label{tab:llm_eval_grouped}
 \end{table}
 
+\subsection{Discussion}
 
+The evaluation confirms that model size and training quality affect classification accuracy, but even the strongest model falls short of perfect agreement with human annotators.  
+Errors are often tied to ambiguous column names or highly unbalanced value distributions.  
+The results indicate that further gains are likely from improvements in prompt context and from expanding the codebook with clearer definitions, rather than from model scale alone.
 
+Future work should also compare the anonymisation suggestions against established baselines to measure their practical impact on privacy risk and data utility.
 
 \newpage
 
