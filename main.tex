@@ -68,9 +68,6 @@ Achieving this balance often requires expertise and context, deciding which attr
 
 \subsection{Identifiers and Quasi-Identifiers}
 
-A central component in assessing the effectiveness of anonymization is understanding the adversary model, that is, what an attacker might already know and how they might use that information. Most privacy frameworks assume that adversaries possess auxiliary information such as partial datasets, public records, or domain knowledge, which they can use to link quasi-identifiers in an anonymized dataset back to specific individuals. This modeling of re-identification risk is crucial because it highlights the limitations of naive anonymization, without a formal privacy model, it is impossible to quantify the likelihood of a privacy breach. Techniques such as $k$-anonymity, $l$-diversity, and $t$-closeness each rely on different assumptions about adversary knowledge and goals. By integrating these models into anonymization strategies, systems can offer stronger, quantifiable privacy guarantees. Our work adopts this perspective by incorporating formal risk metrics directly into the anonymization recommendation process.
-
-
 To give a broader context, we first define key terms related to data anonymization.
 \textbf{Identifiers} are attributes in a dataset that can be used to uniquely identify an individual. They can be classified into two main categories:
 
